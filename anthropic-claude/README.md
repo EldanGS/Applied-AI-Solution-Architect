@@ -1,8 +1,8 @@
 # Anthropic (Claude) Path — Toward Claude Certified Architect
 
-> **Target certification:** Claude Certified Architect – Foundations (**CCAR-F**) · **Stretch goal:** Claude Certified Architect – Professional (**CCAR-P**) · **Facts checked:** 2026-10-03 against the official exam guide v1.0 (effective July 2026)
+> **Primary targets:** Claude Certified Architect – Foundations (**CCAR-F**), then Claude Certified Architect – Professional (**CCAR-P**) · **Secondary:** CCDV-F and CCAO-F · **Status:** chapters 01–13 and the CCAR-F exam-prep folder written; 14–22 and the other exam-prep folders planned · **Facts checked:** 2026-10-03 against the official exam guides v1.0 (effective July 2026)
 
-This branch of the repo is the Claude half of the journey. Chapters 01–06 cover the platform itself: the Claude API, tool use, the Claude Agent SDK, the Model Context Protocol (MCP), Claude Code and prompt engineering. Chapters 07–12 cover what it takes to run those systems in production: batch processing, task decomposition, escalation and human review, error handling across agents, context management and provenance. Everything is taught through the lens of the architect exam, with notes for the other three Claude certifications where their blueprints go further. Each chapter folder pairs a **README** (the theory, which renders on GitHub and is easy to share) with two runnable Python notebooks: **`01_practice.ipynb`** (guided practical work, one section per README concept, ending in a mini-project) and **`02_homework.ipynb`** (a self-test with a quiz, auto-checked coding exercises and an architecture scenario).
+This branch of the repo is the Claude half of the journey. Chapters 01–06 cover the platform itself: the Claude API, tool use, the Claude Agent SDK, the Model Context Protocol (MCP), Claude Code and prompt engineering. Chapters 07–13 cover what it takes to run those systems in production: batch processing, task decomposition, escalation and human review, error handling across agents, context management, provenance and Claude Code's built-in tools. [`exam-prep/`](exam-prep/README.md) turns them into one study folder per certification, starting with [CCAR-F](exam-prep/ccar-f/README.md), and the four CCAR-F preparation exercises are built end to end as [capstones 01–04](../applied-ai-architect/capstones/README.md) in the applied-ai-architect track. Chapters 14–22 (planned) add what CCDV-F, CCAR-P and CCAO-F test beyond CCAR-F. Everything is taught through the lens of the architect exam, with notes for the other three Claude certifications where their blueprints go further. Each chapter folder pairs a **README** (the theory, which renders on GitHub and is easy to share) with two runnable Python notebooks: **`01_practice.ipynb`** (guided practical work, one section per README concept, ending in a mini-project) and **`02_homework.ipynb`** (a self-test with a quiz, auto-checked coding exercises and an architecture scenario).
 
 The chapter order follows the community study guide by [paullarionov](https://github.com/paullarionov/claude-certified-architect/blob/main/guide_en.md). That guide puts everything on one long page. Here each topic gets its own folder, rewritten and expanded, and checked against the current official docs. Where the guide has fallen behind, the chapter says so in a **"Note: changed since the guide"** callout.
 
@@ -13,17 +13,26 @@ flowchart TD
         direction LR
         C1["01 Claude API"] --> C2["02 Tool use"] --> C3["03 Agent SDK"] --> C4["04 MCP"] --> C5["05 Claude Code"] --> C6["06 Prompt engineering"]
     end
-    subgraph RL["Production reliability: chapters 07–12"]
+    subgraph RL["Production reliability: chapters 07–13"]
         direction LR
-        C7["07 Message Batches"] --> C8["08 Task decomposition"] --> C9["09 Escalation and HITL"] --> C10["10 Multi-agent errors"] --> C11["11 Context management"] --> C12["12 Provenance"]
+        C7["07 Message Batches"] --> C8["08 Task decomposition"] --> C9["09 Escalation and HITL"] --> C10["10 Multi-agent errors"] --> C11["11 Context management"] --> C12["12 Provenance"] --> C13["13 Built-in tools"]
     end
-    subgraph RM["Roadmap"]
+    subgraph XF["Built: CCAR-F prep"]
         direction LR
-        C13["13 Built-in tools"] --> X["Exam prep: CCAO-F, CCDV-F,<br/>CCAR-F, CCAR-P + capstones"]
+        XP["exam-prep/ccar-f<br/>drills + original mock"]
+        CAP["Capstones 01–04<br/>(applied-ai-architect)"]
     end
-    F --> RL --> RM
-    RM --> E(("CCAR-F exam"))
-    E -.-> E2(["Then: CCDV-F, CCAR-P, CCAO-F"])
+    subgraph RM["Roadmap (planned)"]
+        direction LR
+        C14["14–21 CCDV-F and CCAR-P depth:<br/>streaming, vision, models and caching,<br/>skills, MCP in production, Claude Code<br/>for teams and at scale, Managed Agents"] --> C22["22 Claude apps<br/>(CCAO-F)"]
+        XR["exam-prep/ccar-p, ccdv-f, ccao-f"]
+    end
+    F --> RL --> XF
+    XF --> E(("CCAR-F exam"))
+    RL --> RM
+    E --> E2(("CCAR-P exam"))
+    RM --> E2
+    RM -.-> E3(["Secondary: CCDV-F, CCAO-F"])
 ```
 
 ---
@@ -233,12 +242,12 @@ Every question sits inside a scenario: a short description of a system you are b
 
 | # | Scenario (official name) | What you are building, in brief | Primary domains | Where this repo covers it |
 |---|---|---|---|---|
-| 1 | **Customer Support Resolution Agent** | An Agent SDK agent that handles high-ambiguity returns, billing disputes and account problems through custom MCP tools (`get_customer`, `lookup_order`, `process_refund`, `escalate_to_human`). The target is 80%+ first-contact resolution while knowing when to escalate. | D1, D2, D5 | [02](02-tool-use/README.md), [03](03-agent-sdk/README.md), [04](04-model-context-protocol/README.md), [09](09-escalation-human-in-the-loop/README.md) |
-| 2 | **Code Generation with Claude Code** | Using Claude Code day to day for generation, refactoring, debugging and docs, shaped by CLAUDE.md, custom commands and skills, and knowing when to plan first. | D3, D5 | [05](05-claude-code/README.md), [11](11-context-management/README.md) |
-| 3 | **Multi-Agent Research System** | An Agent SDK coordinator that delegates web search, document analysis, synthesis and report generation to specialized subagents, and produces comprehensive, cited reports. (Related task statements also cover what to do when a subagent fails.) | D1, D2, D5 | [03](03-agent-sdk/README.md), [08](08-task-decomposition/README.md), [10](10-multi-agent-error-handling/README.md), [11](11-context-management/README.md), [12](12-provenance/README.md) |
-| 4 | **Developer Productivity with Claude** | An agent built with the Agent SDK, the built-in tools (Read, Write, Bash, Grep, Glob) and MCP servers that helps engineers explore unfamiliar codebases, understand legacy systems, generate boilerplate and automate repetitive tasks. | D2, D3, D1 | [03](03-agent-sdk/README.md), [04](04-model-context-protocol/README.md), [05](05-claude-code/README.md), [11](11-context-management/README.md), 13 (roadmap) |
-| 5 | **Claude Code for Continuous Integration** | Running Claude Code headless in a pipeline for automated PR review, test generation and feedback, with prompts tuned to keep false positives low. | D3, D4 | [05](05-claude-code/README.md), [06](06-prompt-engineering/README.md), [08](08-task-decomposition/README.md) |
-| 6 | **Structured Data Extraction** | Pulling fields out of unstructured documents, validating the output against JSON schemas, keeping accuracy high, handling edge cases gracefully and integrating with downstream systems. | D4, D5 | [02](02-tool-use/README.md), [06](06-prompt-engineering/README.md), [07](07-message-batches/README.md), [12](12-provenance/README.md) |
+| 1 | **Customer Support Resolution Agent** | An Agent SDK agent that handles high-ambiguity returns, billing disputes and account problems through custom MCP tools (`get_customer`, `lookup_order`, `process_refund`, `escalate_to_human`). The target is 80%+ first-contact resolution while knowing when to escalate. | D1, D2, D5 | [02](02-tool-use/README.md), [03](03-agent-sdk/README.md), [04](04-model-context-protocol/README.md), [09](09-escalation-human-in-the-loop/README.md); [capstone 01](../applied-ai-architect/capstones/01-support-resolution-agent/README.md) |
+| 2 | **Code Generation with Claude Code** | Using Claude Code day to day for generation, refactoring, debugging and docs, shaped by CLAUDE.md, custom commands and skills, and knowing when to plan first. | D3, D5 | [05](05-claude-code/README.md), [11](11-context-management/README.md); [capstone 04](../applied-ai-architect/capstones/04-coding-agents-for-a-team/README.md) |
+| 3 | **Multi-Agent Research System** | An Agent SDK coordinator that delegates web search, document analysis, synthesis and report generation to specialized subagents, and produces comprehensive, cited reports. (Related task statements also cover what to do when a subagent fails.) | D1, D2, D5 | [03](03-agent-sdk/README.md), [08](08-task-decomposition/README.md), [10](10-multi-agent-error-handling/README.md), [11](11-context-management/README.md), [12](12-provenance/README.md); [capstone 02](../applied-ai-architect/capstones/02-multi-agent-research-with-provenance/README.md) |
+| 4 | **Developer Productivity with Claude** | An agent built with the Agent SDK, the built-in tools (Read, Write, Bash, Grep, Glob) and MCP servers that helps engineers explore unfamiliar codebases, understand legacy systems, generate boilerplate and automate repetitive tasks. | D2, D3, D1 | [03](03-agent-sdk/README.md), [04](04-model-context-protocol/README.md), [05](05-claude-code/README.md), [11](11-context-management/README.md), [13](13-claude-code-builtin-tools/README.md); [capstone 04](../applied-ai-architect/capstones/04-coding-agents-for-a-team/README.md) |
+| 5 | **Claude Code for Continuous Integration** | Running Claude Code headless in a pipeline for automated PR review, test generation and feedback, with prompts tuned to keep false positives low. | D3, D4 | [05](05-claude-code/README.md), [06](06-prompt-engineering/README.md), [08](08-task-decomposition/README.md); [capstone 04](../applied-ai-architect/capstones/04-coding-agents-for-a-team/README.md) |
+| 6 | **Structured Data Extraction** | Pulling fields out of unstructured documents, validating the output against JSON schemas, keeping accuracy high, handling edge cases gracefully and integrating with downstream systems. | D4, D5 | [02](02-tool-use/README.md), [06](06-prompt-engineering/README.md), [07](07-message-batches/README.md), [12](12-provenance/README.md); [capstone 03](../applied-ai-architect/capstones/03-extraction-pipeline-at-scale/README.md) |
 
 ### Community-reported scenarios (not in the official v1.0 bank)
 
@@ -255,7 +264,7 @@ The community guide lists two more scenarios. They are **not** in the official v
 
 ## Chapter map
 
-Chapters follow the order of the community guide. Each one builds on the previous: first the raw API, then tools, then agents, then MCP, then Claude Code, then prompting technique. Chapters 07–12 then take those building blocks into production: cost and throughput, decomposition, human oversight, failure handling, context and provenance. Every chapter folder holds the same three files: `README.md` (theory), `01_practice.ipynb` (guided practical work) and `02_homework.ipynb` (self-test).
+Chapters follow the order of the community guide. Each one builds on the previous: first the raw API, then tools, then agents, then MCP, then Claude Code, then prompting technique. Chapters 07–13 then take those building blocks into production: cost and throughput, decomposition, human oversight, failure handling, context, provenance and the built-in tools. Every chapter folder holds the same three files: `README.md` (theory), `01_practice.ipynb` (guided practical work) and `02_homework.ipynb` (self-test).
 
 | Chapter folder | Topic | Primary exam domain(s) | Status |
 |---|---|---|---|
@@ -271,45 +280,64 @@ Chapters follow the order of the community guide. Each one builds on the previou
 | [10-multi-agent-error-handling](10-multi-agent-error-handling/README.md) | Error categories, anti-patterns, structured subagent errors, local recovery, coverage annotations in the final synthesis | D5 (5.3), D2 (2.2) | 📝 |
 | [11-context-management](11-context-management/README.md) | Case-facts extraction, trimming tool results, position-aware input ("lost in the middle"), scratchpad files, delegating to subagents, state persistence and resumption | D5 (5.1, 5.4), D1 (1.7) | 📝 |
 | [12-provenance](12-provenance/README.md) | Claim–source mappings, preventing attribution loss, conflicting sources, dates and uncertainty, rendering citations | D5 (5.6), D1, D4 | 📝 |
+| [13-claude-code-builtin-tools](13-claude-code-builtin-tools/README.md) | Read, Write, Edit, Bash, Grep, Glob and when to use each; incremental codebase exploration; the Edit fallback; built-in vs MCP tools | D2 (2.5), D5 (5.4) | 📝 |
+| [exam-prep](exam-prep/README.md) | Certification ladder, program rules for all four exams, Academy and Partner Academy checklist, NDA-safe sharing | All four exams | 📝 |
+| [exam-prep/ccar-f](exam-prep/ccar-f/README.md) | All 30 task statements mapped to chapters, drills for the six official scenarios, an original 60-item mock (4 scenarios × 15 items) | CCAR-F, all domains | 📝 |
 
 Status legend (same as the [root progress tracker](../README.md#progress-tracker)): ✅ done (studied, notebooks run against the live API) · 🚧 in progress · 📝 written: README and both notebooks drafted, not yet run end to end against the live API · ⏳ planned.
 
 ## Roadmap
 
-These folders are planned and are listed here without links until they exist.
+The folders below are planned and are listed without links until they exist. Chapters 14–22 mirror the planned OpenAI chapters with the same numbers (see the [OpenAI planned chapter folders](../openai-codex/README.md#planned-chapter-folders)). Each one goes deeper than the CCAR-F blueprint, into ground that CCDV-F, CCAR-P or CCAO-F tests (several topics are on the CCAR-F out-of-scope list).
 
-| Chapter folder (planned) | Topic | Primary exam domain(s) | Status |
+| Chapter folder (planned) | Topic | Main certification domains | Status |
 |---|---|---|---|
-| `13-claude-code-builtin-tools` | Read, Write, Edit, Bash, Grep, Glob, and when to use each; incremental codebase exploration | D2 (2.5), D5 (5.4) | ⏳ |
-| `exam-prep` | One subfolder per Claude certification (below), each with domain review sheets mapped to the official task statements, pointers to the official sample questions (kept in the exam guides, not copied here), a self-made scenario drill bank and a readiness checklist; plus four capstone notebooks shared by all of them | All | ⏳ |
+| `14-streaming-thinking-and-resilient-clients` | Streaming events and recovery, extended and adaptive thinking, SDK vs raw REST, sync vs async clients, error taxonomy, retries with backoff, debugging | CCDV-F D2, D4, D5 | ⏳ |
+| `15-vision-pdfs-files-and-citations` | Image and PDF content blocks, the Files API, the Citations API and `search_result` blocks, data-access patterns | CCDV-F D2 | ⏳ |
+| `16-models-prompt-caching-and-cost` | Choosing among Fable, Opus, Sonnet and Haiku, version pinning and migration, prompt caching, token budgeting and cost modeling, model choice for business users | CCDV-F D5, CCAO-F D3, CCAR-P D2 | ⏳ |
+| `17-agent-skills-and-customization-choices` | Agent Skills across Claude apps, Claude Code, the API and the Agent SDK; choosing between tools, Skills, MCP, subagents and CLAUDE.md | CCDV-F D8, CCAR-P D2 | ⏳ |
+| `18-mcp-in-production` | Sampling, notifications and roots, transports in depth, deploying remote MCP servers with OAuth, scaling and gateways | CCDV-F D8 | ⏳ |
+| `19-claude-code-for-teams` | Settings layers and managed settings, permissions, hooks as guardrails, custom subagents, plugins and marketplaces, team rollout | CCDV-F D2, D3, CCAR-P D7 | ⏳ |
+| `20-claude-code-automation-at-scale` | Headless runs and routines, GitHub Actions and automated review, parallel sessions and worktrees, modernization engagements, measuring impact | CCDV-F D2, CCAR-P D7 | ⏳ |
+| `21-managed-agents-memory-and-frameworks` | Your own loop vs the Agent SDK vs Claude Managed Agents, agent memory, HITL checkpoints, agent frameworks (Strands, LangGraph, PydanticAI) | CCDV-F D1 | ⏳ |
+| `22-claude-apps-projects-and-cowork` | Claude apps for knowledge work: Projects, artifacts, research, connectors, skills and plugins in the apps, Claude Cowork | CCAO-F D2, D3, D5 | ⏳ |
 
-**Planned exam-prep subfolders, one per certification.** The chapters are written against the CCAR-F blueprint, and each chapter's certification-coverage section also maps the matching task statements of the other three exams. `exam-prep/` turns those mappings into a study path per exam:
+### Exam prep: one folder per certification
 
-| Subfolder (planned) | Exam | What it adds on top of chapters 01–13 |
-|---|---|---|
-| `exam-prep/CCAR-F/` | Claude Certified Architect – Foundations (primary target) | Review sheets for D1–D5 and all 30 task statements, drills for the six official scenarios, the four capstones |
-| `exam-prep/CCDV-F/` | Claude Certified Developer – Foundations | Heavier on Applications and Integration (33.1%) and Model Selection and Optimization (16.8%): SDK error handling, streaming, caching, batch vs real time, model choice |
-| `exam-prep/CCAR-P/` | Claude Certified Architect – Professional | Evaluation, testing and optimization, governance and risk, stakeholder communication and lifecycle, RAG design: the areas CCAR-F leaves out of scope |
-| `exam-prep/CCAO-F/` | Claude Certified Associate – Foundations | Business-facing review: output evaluation, product and model selection, configuration and knowledge management, responsible use, no code required |
+The chapters are written against the CCAR-F blueprint, and each chapter's **Certification coverage** section also maps the matching requirements of the other three exams. [`exam-prep/`](exam-prep/README.md) turns those mappings into a study path per exam. Every certification folder has a README (blueprint, domain → chapter map, study plan, traps), `01_practice.ipynb` (scenario drills) and `02_homework.ipynb` (a full-length original mock in the exam's format and weights).
 
-**Planned capstone notebooks (`exam-prep/`).** The official guide's "Preparation Exercises" section (section 8) describes four hands-on exercises. Each one becomes an end-to-end notebook that ties several chapters together (the headless CI review in notebook 02 is an addition of this repo, not part of the official exercise):
+| Folder | Exam | Builds on | Status |
+|---|---|---|---|
+| [exam-prep/](exam-prep/README.md) (index) | All four: ladder, program rules, Academy checklist | — | 📝 |
+| [exam-prep/ccar-f/](exam-prep/ccar-f/README.md) | Claude Certified Architect – Foundations (primary target 1) | Chapters 01–13, capstones 01–04 | 📝 |
+| `exam-prep/ccar-p/` (planned) | Claude Certified Architect – Professional (primary target 2) | Mostly the [applied-ai-architect](../applied-ai-architect/README.md) track, plus chapters 06, 16, 17, 19 and 20; capstones 05–06 | ⏳ |
+| `exam-prep/ccdv-f/` (planned) | Claude Certified Developer – Foundations (secondary) | Chapters 01–21, applied-ai-architect 10 (security) | ⏳ |
+| `exam-prep/ccao-f/` (planned) | Claude Certified Associate – Foundations (secondary) | Chapter 22, applied-ai-architect 01–02, 11–12 | ⏳ |
 
-| Notebook (planned) | Exercise | Chapters it combines |
-|---|---|---|
-| `01_support_agent_with_escalation.ipynb` | A multi-tool support agent with escalation logic and hook-enforced policies | 02, 03, 04, 09 |
-| `02_team_claude_code_setup.ipynb` | Configure Claude Code for a team: CLAUDE.md layers, path rules, skills, MCP, headless CI review | 04, 05, 13 |
-| `03_batch_extraction_pipeline.ipynb` | A structured extraction pipeline over a batch of 100 documents, with schema validation and retry of failures | 02, 06, 07 |
-| `04_multi_agent_research_with_provenance.ipynb` | A coordinator + subagent research pipeline that keeps citations and reports coverage gaps | 03, 08, 10, 11, 12 |
+### Capstones (built in the applied-ai-architect track)
+
+The official CCAR-F guide's "Preparation Exercises" section describes four hands-on exercises. Each one is built as an end-to-end capstone that ties several chapters together, implemented on Claude and on OpenAI side by side. They live in [applied-ai-architect/capstones/](../applied-ai-architect/capstones/README.md), each with the same three files as a chapter.
+
+| Capstone | Official exercise and scenarios | Claude chapters it combines | Status |
+|---|---|---|---|
+| [01 · Customer support resolution agent](../applied-ai-architect/capstones/01-support-resolution-agent/README.md) | Exercise 1; scenario 1 | 02, 03, 04, 08, 09, 10 | 📝 |
+| [02 · Multi-agent research system with provenance](../applied-ai-architect/capstones/02-multi-agent-research-with-provenance/README.md) | Exercise 4; scenario 3 | 03, 08, 10, 11, 12 | 📝 |
+| [03 · Structured extraction pipeline at scale](../applied-ai-architect/capstones/03-extraction-pipeline-at-scale/README.md) | Exercise 3; scenario 6 | 02, 06, 07, 09 | 📝 |
+| [04 · Coding agents for a team](../applied-ai-architect/capstones/04-coding-agents-for-a-team/README.md) | Exercise 2; scenarios 2, 4 and 5 | 04, 05 (13 optional) | 📝 |
+
+Capstones 05 (enterprise RAG assistant) and 06 (discovery-to-production engagement) are planned as CCAR-P preparation; see the [capstones index](../applied-ai-architect/capstones/README.md#the-six-capstones).
 
 ---
 
 ## Domain → chapter coverage matrix
 
-● = primary coverage · ○ = supporting coverage. Chapter 13 is on the [Roadmap](#roadmap).
+### CCAR-F (domain and task-statement level)
+
+● = primary coverage · ○ = supporting coverage. The [exam-prep/ccar-f](exam-prep/ccar-f/README.md) README maps every task statement to its sections, and [COVERAGE.md](../COVERAGE.md) maps every requirement ID.
 
 | Domain | 01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 | 10 | 11 | 12 | 13 |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| D1 Agentic Architecture & Orchestration (27%) | ○ | ○ | ● |   | ○ | ○ |   | ● | ○ | ○ | ○ | ○ |   |
+| D1 Agentic Architecture & Orchestration (27%) | ○ | ○ | ● |   | ○ | ○ |   | ● | ○ | ○ | ○ | ○ | ○ |
 | D2 Tool Design & MCP Integration (18%) |   | ● | ○ | ● | ○ |   |   |   |   | ○ |   |   | ● |
 | D3 Claude Code Configuration & Workflows (20%) |   |   |   | ○ | ● | ○ |   |   |   |   | ○ |   | ○ |
 | D4 Prompt Engineering & Structured Output (20%) | ○ | ● |   |   | ○ | ● | ● | ● | ○ |   |   | ○ |   |
@@ -331,7 +359,7 @@ These folders are planned and are listed here without links until they exist.
 | 2.2 Structured MCP error responses | [04](04-model-context-protocol/README.md) | [02](02-tool-use/README.md), [10](10-multi-agent-error-handling/README.md) |
 | 2.3 Distributing tools across agents; `tool_choice` | [02](02-tool-use/README.md) | [03](03-agent-sdk/README.md) |
 | 2.4 MCP servers in Claude Code and agents | [04](04-model-context-protocol/README.md) | [05](05-claude-code/README.md) |
-| 2.5 Built-in tools | 13 (roadmap) | [05](05-claude-code/README.md) |
+| 2.5 Built-in tools | [13](13-claude-code-builtin-tools/README.md) | [05](05-claude-code/README.md), [04](04-model-context-protocol/README.md) (MCP vs built-in) |
 | 3.1 CLAUDE.md hierarchy | [05](05-claude-code/README.md) | — |
 | 3.2 Custom slash commands and skills | [05](05-claude-code/README.md) | — |
 | 3.3 Path-specific rules | [05](05-claude-code/README.md) | — |
@@ -347,11 +375,52 @@ These folders are planned and are listed here without links until they exist.
 | 5.1 Conversation context preservation | [11](11-context-management/README.md) | [01](01-claude-api-fundamentals/README.md) |
 | 5.2 Escalation and ambiguity | [09](09-escalation-human-in-the-loop/README.md) | [03](03-agent-sdk/README.md) (hooks) |
 | 5.3 Error propagation in multi-agent systems | [10](10-multi-agent-error-handling/README.md) | [03](03-agent-sdk/README.md), [07](07-message-batches/README.md) |
-| 5.4 Context in large-codebase exploration | [11](11-context-management/README.md) | [05](05-claude-code/README.md), 13 (roadmap) |
+| 5.4 Context in large-codebase exploration | [11](11-context-management/README.md) | [05](05-claude-code/README.md), [13](13-claude-code-builtin-tools/README.md) |
 | 5.5 Human review and confidence calibration | [09](09-escalation-human-in-the-loop/README.md) | [06](06-prompt-engineering/README.md), [07](07-message-batches/README.md) |
 | 5.6 Information provenance and uncertainty | [12](12-provenance/README.md) | [10](10-multi-agent-error-handling/README.md), [11](11-context-management/README.md) |
 
 </details>
+
+### CCAR-P, CCDV-F and CCAO-F (domain level)
+
+These three exams go beyond the chapters written so far. The tables show, per official domain, which built chapters already teach part of it (● primary for at least one requirement, ○ supporting only) and where the rest is planned. The per-ID detail is in [COVERAGE.md](../COVERAGE.md#ccar-p-by-domain).
+
+**CCAR-P · Claude Certified Architect – Professional**
+
+| Domain (official numbering) | Weight | Built chapters today | Planned primary homes |
+|---|---|---|---|
+| D1 Solution Design & Architecture | 17% | [08](08-task-decomposition/README.md) ●, [03](03-agent-sdk/README.md) ○, [07](07-message-batches/README.md) ○ | applied-ai-architect 03, 04 |
+| D2 Claude Models, Prompting & Context Engineering | 13% | [06](06-prompt-engineering/README.md) ●, [11](11-context-management/README.md) ● | 16, 17; applied-ai-architect 11 |
+| D3 Integration | 19% | [09](09-escalation-human-in-the-loop/README.md)–[12](12-provenance/README.md) ○ | applied-ai-architect 04, 06, 07, 10, 15, 16 |
+| D4 Evaluation, Testing & Optimization | 16% | [06](06-prompt-engineering/README.md)–[12](12-provenance/README.md) ○ | applied-ai-architect 08, 09, 15, 16 |
+| D5 Governance, Safety & Risk Management | 14% | [09](09-escalation-human-in-the-loop/README.md), [10](10-multi-agent-error-handling/README.md), [12](12-provenance/README.md) ○ | applied-ai-architect 11, 12 |
+| D6 Stakeholder Communication & Lifecycle Management | 14% | — | applied-ai-architect 03, 18, 19 |
+| D7 Developer Productivity & Operational Enablement | 7% | — | 19, 20; applied-ai-architect 16 |
+
+**CCDV-F · Claude Certified Developer – Foundations**
+
+| Domain (official numbering) | Weight | Built chapters today | Planned primary homes |
+|---|---|---|---|
+| D1 Agents and Workflows | 14.7% | [02](02-tool-use/README.md) ●, [03](03-agent-sdk/README.md) ●, [08](08-task-decomposition/README.md) ●, [11](11-context-management/README.md) ●, [09](09-escalation-human-in-the-loop/README.md) ○ | 21; applied-ai-architect 04 |
+| D2 Applications and Integration | 33.1% | [00](../00-prerequisites/README.md) ●, [01](01-claude-api-fundamentals/README.md) ●, [02](02-tool-use/README.md) ●, [05](05-claude-code/README.md) ●, [06](06-prompt-engineering/README.md) ●, [07](07-message-batches/README.md) ●, [11](11-context-management/README.md) ● | 14, 15, 16, 19, 20, 22; applied-ai-architect 03, 19 |
+| D3 Claude Code | 3.1% | [05](05-claude-code/README.md) ●, [11](11-context-management/README.md) ○, [13](13-claude-code-builtin-tools/README.md) ○ | 19 |
+| D4 Eval, Testing, and Debugging | 2.6% | [10](10-multi-agent-error-handling/README.md) ○ | 14; applied-ai-architect 16 |
+| D5 Model Selection and Optimization | 16.8% | [00](../00-prerequisites/README.md) ●, [01](01-claude-api-fundamentals/README.md) ●, [06](06-prompt-engineering/README.md) ●, [07](07-message-batches/README.md) ● | 14, 16 |
+| D6 Prompt and Context Engineering | 11.0% | [02](02-tool-use/README.md) ●, [06](06-prompt-engineering/README.md) ●, [11](11-context-management/README.md) ● | 21; applied-ai-architect 10 |
+| D7 Security and Safety | 8.1% | [06](06-prompt-engineering/README.md), [09](09-escalation-human-in-the-loop/README.md), [12](12-provenance/README.md) ○ | applied-ai-architect 10, 11, 13; 19 |
+| D8 Tools and MCPs | 10.6% | [02](02-tool-use/README.md) ●, [03](03-agent-sdk/README.md) ●, [04](04-model-context-protocol/README.md) ●, [09](09-escalation-human-in-the-loop/README.md) ○, [10](10-multi-agent-error-handling/README.md) ○, [13](13-claude-code-builtin-tools/README.md) ○ | 17, 18 |
+
+**CCAO-F · Claude Certified Associate – Foundations**
+
+| Domain (official numbering) | Weight | Built chapters today | Planned primary homes |
+|---|---|---|---|
+| D1 Prompting and Task Execution | 14% | [08](08-task-decomposition/README.md) ●, [06](06-prompt-engineering/README.md) ○ | applied-ai-architect 01 |
+| D2 Output Evaluation and Validation | 21% | [06](06-prompt-engineering/README.md), [08](08-task-decomposition/README.md), [09](09-escalation-human-in-the-loop/README.md), [10](10-multi-agent-error-handling/README.md), [12](12-provenance/README.md) ○ | applied-ai-architect 01; 22 |
+| D3 Product and Model Selection | 12% | [07](07-message-batches/README.md), [11](11-context-management/README.md), [12](12-provenance/README.md) ○ | 16, 22 |
+| D4 Workflow Integration and Solution Design | 16% | [12](12-provenance/README.md) ○ | applied-ai-architect 02, 18 |
+| D5 Configuration and Knowledge Management | 12% | — | 22 |
+| D6 Governance, Risk, and Responsible Use | 15% | — | applied-ai-architect 11, 12 |
+| D7 Troubleshooting and Optimization | 10% | — | applied-ai-architect 01, 02 |
 
 ---
 
@@ -368,8 +437,8 @@ The plan assumes roughly **8–10 hours a week** next to a full-time job, and th
 | 4 | MCP: servers, config, error handling | [04](04-model-context-protocol/README.md) | Introduction to MCP; MCP: Advanced Topics | D2 |
 | 5 | Claude Code for a team, plus CI | [05](05-claude-code/README.md) | Claude Code in Action; Introduction to Agent Skills | D3 |
 | 6 | Prompting technique, plus batch processing | [06](06-prompt-engineering/README.md), [07](07-message-batches/README.md) | Building with the Claude API (second half) | D4 |
-| 7 | Reliability: decomposition, escalation, multi-agent errors, context, provenance, built-in tools | [08](08-task-decomposition/README.md), [09](09-escalation-human-in-the-loop/README.md), [10](10-multi-agent-error-handling/README.md), [11](11-context-management/README.md), [12](12-provenance/README.md), 13 (roadmap) | — | D1, D5 |
-| 8 | Exam prep: the four capstones, the sample questions in the official guide, a weak-domain review; book the exam | `exam-prep` | — | All |
+| 7 | Reliability: decomposition, escalation, multi-agent errors, context, provenance, built-in tools | [08](08-task-decomposition/README.md), [09](09-escalation-human-in-the-loop/README.md), [10](10-multi-agent-error-handling/README.md), [11](11-context-management/README.md), [12](12-provenance/README.md), [13](13-claude-code-builtin-tools/README.md) | — | D1, D5 |
+| 8 | Exam prep: scenario drills and the original mock, the four capstones, the sample questions in the official guide, a weak-domain review; book the exam | [exam-prep/ccar-f](exam-prep/ccar-f/README.md), [capstones 01–04](../applied-ai-architect/capstones/README.md) | — | All |
 
 **Weekly rhythm that works well:**
 

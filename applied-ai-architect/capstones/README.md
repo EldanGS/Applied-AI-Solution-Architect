@@ -62,7 +62,7 @@ flowchart LR
 | 01 | [Customer support resolution agent](01-support-resolution-agent/README.md) | Resolve order, refund and account issues on first contact, and know when to hand over to a human | CCAR-F SC1, EX1 (D1, D2, D5); OpenAI "Design and Build Agentic Systems" deliverable (outcome and safety requirements, with capstone 02) | Agent architecture, tool design, MCP, human-in-the-loop, agent evaluation, securing tool access | Claude 02, 03, 04, 08, 09, 10 · OpenAI 02, 03, 04, 08, 09, 10 |
 | 02 | [Multi-agent research system with provenance](02-multi-agent-research-with-provenance/README.md) | Produce a cited research report from several sources, and say clearly what is contested or missing | CCAR-F SC3, EX4 (D1, D2, D5); OpenAI "Design and Build Agentic Systems" deliverable (the multi-agent workflow, with capstone 01) | Multi-agent orchestration, context management, hallucination mitigation and citations, resilience | Claude 03, 08, 10, 11, 12 · OpenAI 03, 08, 10, 11 |
 | 03 | [Structured extraction pipeline at scale](03-extraction-pipeline-at-scale/README.md) | Extract validated fields from 100 mixed-format documents overnight, and send uncertain fields to people | CCAR-F SC6, EX3 (D4, D5) | Structured outputs, batch processing, cost trade-offs, representative datasets, human review routing | Claude 02, 06, 07, 09 · OpenAI 02, 06, 07, 09 |
-| 04 | [Coding agents for a team](04-coding-agents-for-a-team/README.md) | Roll out a coding agent to a team with shared standards, safe tool access and automated PR review | CCAR-F SC2, SC4, SC5, EX2 (D3, D2, plus D1, D4 and D5 through the scenarios); OpenAI "Get Started with Codex" deliverable | AI coding agents, MCP, the Claude and OpenAI agent stacks, regression gates, technical documentation | Claude 04, 05 · OpenAI 04, 05 (later also the planned Claude 13, 19, 20 and OpenAI 13, 19, 20) |
+| 04 | [Coding agents for a team](04-coding-agents-for-a-team/README.md) | Roll out a coding agent to a team with shared standards, safe tool access and automated PR review | CCAR-F SC2, SC4, SC5, EX2 (D3, D2, plus D1, D4 and D5 through the scenarios); OpenAI "Get Started with Codex" deliverable | AI coding agents, MCP, the Claude and OpenAI agent stacks, regression gates, technical documentation | Claude 04, 05 (13 optional) · OpenAI 04, 05 (later also the planned Claude 19, 20 and OpenAI 13, 19, 20) |
 | 05 | `05-enterprise-rag-assistant` (planned) | Answer employee policy questions from permitted documents only, with citations, a release gate, tracing and a cost dashboard | CCAR-P preparation advice; CCAR-P D3, D4; OpenAI "Build with RAG" deliverable | RAG (all seven competencies), evaluation, observability, permission-aware access, cost-latency trade-offs | Applied 06, 07, 08, 09, 15, 16 · Claude 12 · OpenAI 04 |
 | 06 | `06-discovery-to-production-engagement` (planned) | Take a fictional company from first discovery call to a governed pilot and a handoff pack | CCAR-P D1, D5, D6; OpenAI "AI Leadership" deliverable (AI strategy brief) and "Scope AI Solutions" skills | Discovery and value case, ownership under ambiguity, executive communication, POC to production, compliance, documentation | Applied 03, 04, 08, 12, 17, 18, 19 |
 
@@ -254,10 +254,10 @@ This overview page maps the six official CCAR-F scenarios to the capstones; it d
 
 | Capstone | Build status | Claude build | OpenAI build | Rubric score | Post |
 |---|---|---|---|---|---|
-| 01 Support resolution agent | 🚧 | [ ] | [ ] | | |
-| 02 Multi-agent research with provenance | 🚧 | [ ] | [ ] | | |
-| 03 Extraction pipeline at scale | 🚧 | [ ] | [ ] | | |
-| 04 Coding agents for a team | 🚧 | [ ] | [ ] | | |
+| 01 Support resolution agent | 📝 | [ ] | [ ] | | |
+| 02 Multi-agent research with provenance | 📝 | [ ] | [ ] | | |
+| 03 Extraction pipeline at scale | 📝 | [ ] | [ ] | | |
+| 04 Coding agents for a team | 📝 | [ ] | [ ] | | |
 | 05 Enterprise RAG assistant | ⏳ | [ ] | [ ] | | |
 | 06 Discovery-to-production engagement | ⏳ | [ ] | [ ] | | |
 

@@ -1,6 +1,6 @@
 # Applied AI Architect Track: Vendor-Neutral Solution Architecture with Claude and OpenAI
 
-> **Goal:** be job-ready as an **Applied AI Solution Architect** · **Main certification served:** Claude Certified Architect – Professional (**CCAR-P**), plus parts of CCAO-F and CCDV-F · **OpenAI Academy courses served:** Scope AI Solutions, Evaluate AI Applications, Build with RAG, Optimize AI Application Performance, AI Leadership · **Status:** 19 chapters planned, capstones 01–04 in progress · **Facts checked:** 2026-10-03
+> **Goal:** be job-ready as an **Applied AI Solution Architect** · **Main certification served:** Claude Certified Architect – Professional (**CCAR-P**), plus parts of CCAO-F and CCDV-F · **OpenAI Academy courses served:** Scope AI Solutions, Evaluate AI Applications, Build with RAG, Optimize AI Application Performance, AI Leadership · **Status:** 19 chapters planned, capstones 01–04 written (📝), capstones 05–06 planned · **Facts checked:** 2026-10-03
 
 The [Claude path](../anthropic-claude/README.md) and the [OpenAI path](../openai-codex/README.md) teach how each vendor's platform works: APIs, tools, agent SDKs, MCP, coding agents, batching and context. This third track covers the work that sits **above** any one vendor. That is what an applied AI architect does with a customer: find the right use case, design the system, prove it works with evals, secure and govern it, deploy it on the right platform, run it in production, and hand it over.
 
@@ -177,10 +177,10 @@ A capstone is one realistic customer problem built end to end **in both stacks**
 
 | # | Capstone | Based on | Claude stack vs OpenAI stack | Status |
 |---|---|---|---|---|
-| 01 | [Customer support resolution agent](capstones/01-support-resolution-agent/README.md) | CCAR-F scenario 1 and exercise 1; part of the OpenAI Design and Build Agentic Systems deliverable | Claude Messages API loop (plus an Agent SDK hooks variant) vs OpenAI Agents SDK guardrails and approvals | 🚧 |
-| 02 | [Multi-agent research system with provenance](capstones/02-multi-agent-research-with-provenance/README.md) | CCAR-F scenario 3 and exercise 4; part of the OpenAI Design and Build Agentic Systems deliverable | Claude orchestrator-workers (Messages API, plus an Agent SDK subagent variant) vs OpenAI agents-as-tools | 🚧 |
-| 03 | [Structured extraction pipeline at scale](capstones/03-extraction-pipeline-at-scale/README.md) | CCAR-F scenario 6 and exercise 3 | Claude Message Batches vs OpenAI Batch API | 🚧 |
-| 04 | [Coding agents for a team](capstones/04-coding-agents-for-a-team/README.md) | CCAR-F scenarios 2, 4, 5 and exercise 2; OpenAI Get Started with Codex deliverable | Claude Code vs Codex | 🚧 |
+| 01 | [Customer support resolution agent](capstones/01-support-resolution-agent/README.md) | CCAR-F scenario 1 and exercise 1; part of the OpenAI Design and Build Agentic Systems deliverable | Claude Messages API loop (plus an Agent SDK hooks variant) vs OpenAI Agents SDK guardrails and approvals | 📝 |
+| 02 | [Multi-agent research system with provenance](capstones/02-multi-agent-research-with-provenance/README.md) | CCAR-F scenario 3 and exercise 4; part of the OpenAI Design and Build Agentic Systems deliverable | Claude orchestrator-workers (Messages API, plus an Agent SDK subagent variant) vs OpenAI agents-as-tools | 📝 |
+| 03 | [Structured extraction pipeline at scale](capstones/03-extraction-pipeline-at-scale/README.md) | CCAR-F scenario 6 and exercise 3 | Claude Message Batches vs OpenAI Batch API | 📝 |
+| 04 | [Coding agents for a team](capstones/04-coding-agents-for-a-team/README.md) | CCAR-F scenarios 2, 4, 5 and exercise 2; OpenAI Get Started with Codex deliverable | Claude Code vs Codex | 📝 |
 | 05 | `05-enterprise-rag-assistant`: enterprise RAG assistant with evals and observability (planned) | CCAR-P preparation advice; OpenAI Build with RAG deliverable | Claude with your own retrieval vs OpenAI File Search | ⏳ |
 | 06 | `06-discovery-to-production-engagement`: a full customer engagement, paper plus prototype (planned) | CCAR-P domains 1, 5, 6; OpenAI AI Leadership deliverable (AI strategy brief) and Scope AI Solutions skills | Vendor-neutral documents; prototype in both stacks | ⏳ |
 
@@ -320,10 +320,10 @@ Copy this table into your fork and update it as you go. Build status uses the le
 | 17 Enterprise rollout and adoption | ⏳ | [ ] | |
 | 18 Stakeholder communication and pre-sales | ⏳ | [ ] | |
 | 19 POC to production: delivery and handoff | ⏳ | [ ] | |
-| Capstone 01 Support resolution agent | 🚧 | [ ] | |
-| Capstone 02 Multi-agent research with provenance | 🚧 | [ ] | |
-| Capstone 03 Extraction pipeline at scale | 🚧 | [ ] | |
-| Capstone 04 Coding agents for a team | 🚧 | [ ] | |
+| Capstone 01 Support resolution agent | 📝 | [ ] | |
+| Capstone 02 Multi-agent research with provenance | 📝 | [ ] | |
+| Capstone 03 Extraction pipeline at scale | 📝 | [ ] | |
+| Capstone 04 Coding agents for a team | 📝 | [ ] | |
 | Capstone 05 Enterprise RAG assistant | ⏳ | [ ] | |
 | Capstone 06 Discovery-to-production engagement | ⏳ | [ ] | |
 | 🎯 CCAO-F (block 3) | — | [ ] | |

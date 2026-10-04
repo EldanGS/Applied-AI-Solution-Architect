@@ -1,8 +1,8 @@
 # OpenAI (Codex) Path: Solution Architect Skills on the OpenAI Platform
 
-> **Status:** chapters 01–11 written (README + 2 notebooks each); 12–14 and exam-prep planned · **Last verified against official docs:** 2026-10-03 · **Language:** Python for every notebook
+> **Status:** chapters 01–11 written (README + 2 notebooks each); 12–24 and exam-prep planned · **Last verified against official docs:** 2026-10-03 · **Language:** Python for every notebook
 
-This is the second branch of the journey. The [Claude path](../anthropic-claude/README.md) teaches the architect skill set against a real, proctored exam. This branch teaches the same skill set on the OpenAI platform: the Responses API, the Agents SDK, the managed Agents API, built-in tools and MCP, Codex, prompting and evals, batch and cost control, orchestration, human-in-the-loop, multi-agent error handling and context management, with provenance, realtime voice and ChatGPT plugins planned next.
+This is the second branch of the journey. The [Claude path](../anthropic-claude/README.md) teaches the architect skill set against a real, proctored exam. This branch teaches the same skill set on the OpenAI platform: the Responses API, the Agents SDK, the managed Agents API, built-in tools and MCP, Codex, prompting and evals, batch and cost control, orchestration, human-in-the-loop, multi-agent error handling and context management. Planned next: provenance and Codex's built-in tools (12–13), mirrors of the deeper Claude chapters 14–22, realtime voice (23) and ChatGPT plugins (24), plus Academy pathway prep under `exam-prep/`.
 
 OpenAI and Anthropic platforms have converged a lot. Both have a core model API, strict tool schemas, structured outputs, MCP, an agent SDK, a coding agent with a project instruction file, and a 50%-off batch API. Because of that overlap, this path is written as a **delta course**. Each chapter starts from what you already learned on the Claude side, then focuses on what is different, what has a different name, and what does not exist on the other side.
 
@@ -15,6 +15,7 @@ OpenAI and Anthropic platforms have converged a lot. Both have a core model API,
 - [Skill tree for an OpenAI solution architect](#skill-tree-for-an-openai-solution-architect)
 - [Which OpenAI runtime do I need?](#which-openai-runtime-do-i-need)
 - [Chapter folders](#chapter-folders)
+  - [Planned chapter folders](#planned-chapter-folders)
 - [Claude ↔ OpenAI concept mapping](#claude--openai-concept-mapping)
 - [Deprecated and retired: do not learn these](#deprecated-and-retired-do-not-learn-these)
 - [Environment setup for this path](#environment-setup-for-this-path)
@@ -31,7 +32,7 @@ OpenAI and Anthropic platforms have converged a lot. Both have a core model API,
 | **Syllabus source** | Exam guide, its 5 domains, and the community study guide | Official docs, the Academy API and Codex pathways, and OpenAI's developer tracks |
 | **Chapter style** | Full theory chapters | Delta chapters: "you know X from Claude; here is the OpenAI version and what's different" |
 | **Folder layout** | `NN-topic/README.md` + `01_practice.ipynb` (guided practice) + `02_homework.ipynb` (self-test) | Same convention |
-| **Exam prep** | Practice questions mapped to the 5 domains | A self-made scenario bank in the same style as the Claude exam, so both paths get tested the same way |
+| **Exam prep** | [`exam-prep/`](../anthropic-claude/exam-prep/README.md): one folder per Claude certification, with scenario drills and an original full-length mock | `exam-prep/` (planned): one folder per Academy pathway (`api-pathway`, `codex-pathway`, `foundations-and-leadership`), with drills and original mock assessments in the Academy's format |
 | **Coding agent** | Claude Code, `CLAUDE.md`, `claude -p` in CI | Codex (CLI, IDE, cloud), `AGENTS.md`, `codex exec` in CI |
 
 **Why do the Claude path first?** The Claude exam gives you a fixed, testable structure: agent loops, tool design, MCP, coding-agent configuration, prompt engineering, and context management. Once those ideas are solid, most of the OpenAI material is a vocabulary and API-shape change. The real differences (server-side conversation state, the managed Agents API, realtime voice, the Codex sandbox model) get a full section in each chapter.
@@ -39,7 +40,7 @@ OpenAI and Anthropic platforms have converged a lot. Both have a core model API,
 **Biggest conceptual differences to keep in mind:**
 
 1. **State.** The Claude Messages API is stateless, so your app resends the history every time. The OpenAI Responses API *can* be used the same way, but it also offers server-side state through `previous_response_id` and the Conversations API. That is an architecture decision (data retention, cost, portability), not just a convenience.
-2. **Three agent runtimes to choose from.** On OpenAI you choose between building the loop yourself on the Responses API, using the Agents SDK (a library you host), or using the Agents API (a managed Codex harness, with the sandbox hosted by OpenAI, by you, or by a sandbox partner). Anthropic now has a similar three-way split (your own loop on the Messages API, the Claude Agent SDK, and Claude Managed Agents, in beta), but the Claude chapters of this repo focus on the first two, so the managed runtime gets its full treatment here.
+2. **Three agent runtimes to choose from.** On OpenAI you choose between building the loop yourself on the Responses API, using the Agents SDK (a library you host), or using the Agents API (a managed Codex harness, with the sandbox hosted by OpenAI, by you, or by a sandbox partner). Anthropic now has a similar three-way split (your own loop on the Messages API, the Claude Agent SDK, and Claude Managed Agents, in beta), but the built Claude chapters of this repo focus on the first two (Claude Managed Agents is planned for Claude chapter 21), so the managed runtime gets its full treatment here first.
 3. **Voice is first-class.** OpenAI has a realtime speech-to-speech API. The Claude path has no matching chapter.
 4. **No embeddings or retrieval primitives on the Claude side.** OpenAI ships embeddings, vector stores, and a hosted `file_search` tool. On Claude you bring your own retrieval stack.
 
@@ -69,7 +70,7 @@ The real options, from the closest fit to the least relevant:
 1. 🎯 **Primary:** OpenAI Academy **API pathway** certificate of completion.
 2. 🎯 **Primary:** OpenAI Academy **Codex pathway** certificate of completion.
 3. ➕ **Optional:** API Builder Bootcamp and Codex Bootcamp completion certificates, if the live dates fit.
-4. 🧱 **Portfolio:** every chapter notebook in this folder, plus one end-to-end capstone (an agent with tools, MCP, structured output, evals and a cost report). Since no exam exists, the portfolio is the real evidence of skill.
+4. 🧱 **Portfolio:** every chapter notebook in this folder, plus the OpenAI half of each [capstone](../applied-ai-architect/capstones/README.md) (capstones 01–04 are written, each built on Claude and on OpenAI side by side). Since no exam exists, the portfolio is the real evidence of skill.
 
 Every post about these will say **"certificate of completion, not a certification."** Being precise here is part of credibility.
 
@@ -157,11 +158,9 @@ flowchart TD
 
 ---
 
-<a id="planned-chapter-folders"></a>
-
 ## Chapter folders
 
-Chapters 01–11 exist. Each folder follows the same convention as the Claude path: a `README.md` (theory, written as a delta on the Claude chapter), `01_practice.ipynb` (guided practical work) and `02_homework.ipynb` (self-test with a quiz, auto-checked exercises and an architecture scenario). Status legend (same as the [root progress tracker](../README.md#progress-tracker)): 📝 written, not yet run end to end against the live API · ⏳ planned.
+Chapters 01–11 exist. The numbers mirror the Claude chapters one to one for 01–22; 23 and 24 are OpenAI-only. Each folder follows the same convention as the Claude path: a `README.md` (theory, written as a delta on the Claude chapter), `01_practice.ipynb` (guided practical work) and `02_homework.ipynb` (self-test with a quiz, auto-checked exercises and an architecture scenario). Status legend (same as the [root progress tracker](../README.md#progress-tracker)): 📝 written, not yet run end to end against the live API · ⏳ planned. Planned folders are in the [next table](#planned-chapter-folders).
 
 | # | Folder | What it covers | Claude chapter it builds on | Academy course it supports | Status |
 |---|---|---|---|---|---|
@@ -176,12 +175,32 @@ Chapters 01–11 exist. Each folder follows the same convention as the Claude pa
 | 09 | [09-escalation-human-in-the-loop](09-escalation-human-in-the-loop/README.md) | Escalation triggers, tool approvals, serializable `RunState`, guardrails and tripwires, MCP approvals, structured handoffs, calibration and stratified review | [09 Escalation and HITL](../anthropic-claude/09-escalation-human-in-the-loop/README.md) | Design and Build Agentic Systems, Scope AI Solutions | 📝 |
 | 10 | [10-multi-agent-error-handling](10-multi-agent-error-handling/README.md) | Error layers (HTTP, Agents SDK, tool output, background and Agents API statuses), retry rules, structured worker errors, partial results, coverage annotations, tracing | [10 Multi-agent Error Handling](../anthropic-claude/10-multi-agent-error-handling/README.md) | Design and Build Agentic Systems, Optimize AI Application Performance | 📝 |
 | 11 | [11-context-management](11-context-management/README.md) | Where state lives (your store, Responses store, Conversations), curated case facts, trimming tool output, compaction, long-context pricing, checkpoints and resumption | [11 Context Management](../anthropic-claude/11-context-management/README.md) | Optimize AI Application Performance, Design and Build Agentic Systems | 📝 |
-| 12 | `12-provenance` (planned) | Claim–source mapping with web search and file search citations (`url_citation`, `file_citation` annotations), conflicting sources, dates and uncertainty | [12 Provenance](../anthropic-claude/12-provenance/README.md) | Build with RAG | ⏳ |
-| 13 | `13-realtime-and-voice` (planned) | Realtime API (GA), GPT-Live, WebRTC and WebSocket, VAD, tools and MCP in realtime sessions, transcription and translation | No Claude equivalent | API Builder Bootcamp: Realtime session | ⏳ |
-| 14 | `14-chatgpt-plugins-and-apps` (planned) | ChatGPT plugins (formerly the Apps SDK): MCP server + skills + UI, plugin extensions, MCP Events, submission, workspace agents (API triggers), Sign in with ChatGPT | [04 MCP](../anthropic-claude/04-model-context-protocol/README.md), [05 Claude Code](../anthropic-claude/05-claude-code/README.md) (plugins) | (none yet) | ⏳ |
-| — | `exam-prep` (planned) | Scenario question bank in the Claude exam style, a checklist for each Academy course, capstone project brief | Claude `exam-prep` (planned, see the [Claude roadmap](../anthropic-claude/README.md#roadmap)) | All | ⏳ |
 
-> **Note: renumbered from the first plan.** The first plan had `08-realtime-and-voice` and `09-chatgpt-plugins-and-apps`. To keep the OpenAI chapters aligned one-to-one with the Claude chapters (and with the CCAR-F task statements they map to), chapters 08–11 now mirror Claude chapters 08–11, and realtime voice and ChatGPT plugins moved to 13 and 14 after a planned `12-provenance`. Earlier still, `09-agentkit-and-apps` was renamed because the name "AgentKit" no longer appears in OpenAI's current docs and Agent Builder (its visual builder) shuts down on 2026-11-30, and `03-agents-sdk` became `03-agents-sdk-and-agents-api`, because the managed Agents API (public beta since 2026-09-10) is a separate runtime you have to choose between.
+### Planned chapter folders
+
+These folders do not exist yet and are listed without links. The numbering follows the repo [curriculum](../README.md#roadmap): Claude NN and OpenAI NN teach the same concept.
+
+| # | Folder (planned) | What it will cover | Claude chapter it mirrors | Academy course, bootcamp or developer track it supports | Status |
+|---|---|---|---|---|---|
+| 12 | `12-provenance-citations-and-annotations` | Claim–source mapping with `url_citation` and `file_citation` annotations from web search and file search, preserving mappings through multi-agent synthesis, conflicting sources, dates and coverage gaps, rendering by content type | [12 Provenance](../anthropic-claude/12-provenance/README.md) | Build with RAG | ⏳ |
+| 13 | `13-codex-builtin-tools` | Codex tools (shell, `apply_patch`, file read and search, web search) and when to use each, incremental exploration of unfamiliar codebases, `apply_patch` failures and fallbacks, hosted or local shell in the Responses API vs inside Codex | [13 Claude Code Built-in Tools](../anthropic-claude/13-claude-code-builtin-tools/README.md) | Codex Bootcamp | ⏳ |
+| 14 | `14-streaming-reasoning-and-resilient-clients` | Streaming events and recovery, background mode, webhooks and WebSocket mode, reasoning items across turns, error codes, retries, timeouts, idempotency, async clients | 14 Streaming, thinking and resilient clients (planned) | — (mirrors CCDV-F objectives) | ⏳ |
+| 15 | `15-vision-files-and-image-generation` | Image and PDF inputs, the Files API, the image generation tool and editing, document-understanding patterns | 15 Vision, PDFs, Files API and citations (planned) | Building agents developer track | ⏳ |
+| 16 | `16-models-migration-and-model-optimization` | The GPT-6 lineup, reasoning vs non-reasoning models, snapshots and deprecations, choosing a model from eval results, fine-tuning and distillation and their current limits | 16 Models, prompt caching and cost (planned) | Optimize AI Application Performance; model optimization track | ⏳ |
+| 17 | `17-skills-and-customization-choices` | Skills in the Responses API and in Codex, reusable team skills, built-in tools vs functions vs skills vs MCP | 17 Agent Skills and customization choices (planned) | Extend Codex Workflows | ⏳ |
+| 18 | `18-mcp-in-production` | Building and deploying a remote MCP server for Responses, the Agents SDK and ChatGPT; auth, `require_approval`, `allowed_tools`, Secure MCP Tunnel; prompt-injection and exfiltration risks | 18 MCP in production (planned) | — (mirrors CCDV-F objectives) | ⏳ |
+| 19 | `19-codex-for-teams` | Team `AGENTS.md` and shared config, approval and sandbox defaults, rules, plan mode, memory, automations, worktrees, review evidence, admin controls | 19 Claude Code for teams (planned) | Extend Codex Workflows; Scale Codex Across Governed Teams and Systems | ⏳ |
+| 20 | `20-codex-automation-at-scale` | Splitting large changes into verifiable workstreams, sub-agents and long-horizon tasks, `codex exec`, the Codex SDK, `codex-action`, Code Review and security workflows | 20 Claude Code automation at scale (planned) | Scale Codex Across Governed Teams and Systems | ⏳ |
+| 21 | `21-agents-api-memory-and-sandboxes` | Agents API vs Agents SDK vs your own loop, hosted, self-hosted and partner sandboxes, vaults, memory and sessions across runs, framework interop | 21 Managed Agents, memory and frameworks (planned) | — (mirrors CCDV-F objectives) | ⏳ |
+| 22 | `22-chatgpt-enterprise-projects-and-workspace-agents` | ChatGPT Projects, connectors, memory, deep research and agent mode, workspace agents and their API triggers, enterprise admin basics | 22 Claude apps, Projects and Cowork (planned) | Foundations pathway (Applied AI Foundations, Agents and Workflows) | ⏳ |
+| 23 | `23-realtime-and-voice` | When voice fits, speech-to-speech vs chained, the Realtime API (GA), GPT-Live, WebRTC vs WebSocket, VAD and interruption, tools and MCP in realtime sessions, transcription and translation | None (OpenAI only) | API Builder Bootcamp: Realtime session | ⏳ |
+| 24 | `24-chatgpt-plugins-and-apps` | ChatGPT plugins (formerly the Apps SDK): MCP server + skills + UI, plugin extensions, MCP Events, submission, Sign in with ChatGPT, converting a Claude Code plugin | [04 MCP](../anthropic-claude/04-model-context-protocol/README.md), 19 (plugins, planned); Claude connectors | (none yet) | ⏳ |
+| — | `exam-prep/` | Index: Academy rules (ChatGPT sign-in, 80% assessments, badges, "not certifications"), bootcamp attendance certificates, pathway tracker | Claude [exam-prep](../anthropic-claude/exam-prep/README.md) | All | ⏳ |
+| — | `exam-prep/api-pathway/` | Per-course checklist, course → chapter map, drills, five original 20-question mock assessments | — | API pathway (5 courses) + API Builder Bootcamp | ⏳ |
+| — | `exam-prep/codex-pathway/` | Per-course checklist, course → chapter map, drills, three original 20-question mock assessments | — | Codex pathway (3 courses) + Codex Bootcamp | ⏳ |
+| — | `exam-prep/foundations-and-leadership/` | Foundations pathway and AI Leadership checklists, drills, original mocks | — | Foundations pathway, AI Leadership | ⏳ |
+
+> **Note: renumbered from earlier plans.** The first plan had `08-realtime-and-voice` and `09-chatgpt-plugins-and-apps`; an interim plan moved them to 13 and 14 after `12-provenance`. To keep every OpenAI chapter aligned one to one with the Claude chapter of the same number (and with the certification requirements it maps to), 12 is now provenance (`12-provenance-citations-and-annotations`), 13 is Codex's built-in tools, 14–22 mirror the planned Claude chapters 14–22, and realtime voice and ChatGPT plugins moved to 23 and 24. Earlier still, `09-agentkit-and-apps` was renamed because the name "AgentKit" no longer appears in OpenAI's current docs and Agent Builder (its visual builder) shuts down on 2026-11-30, and `03-agents-sdk` became `03-agents-sdk-and-agents-api`, because the managed Agents API (public beta since 2026-09-10) is a separate runtime you have to choose between.
 
 ---
 
@@ -203,7 +222,7 @@ Use this table as your translation layer. "≈" means similar purpose but a mean
 | Agent framework | Claude Agent SDK (`claude-agent-sdk`, `query()`, `ClaudeAgentOptions`) | Agents SDK (`openai-agents`, `from agents import Agent, Runner, function_tool`) | ≈ | The Claude Agent SDK *is* the Claude Code harness, with file and bash tools built in. The OpenAI Agents SDK is a lighter orchestration library on top of Responses. The closest match to "the coding harness as a library" is the **Codex SDK** or the **Agents API**. | 03 |
 | Multi-agent | Subagents (coordinator delegates through the Agent/Task tool) | Handoffs (control moves to another agent) and agents-as-tools (coordinator keeps control); `multi_agent` subagents in the Agents API | ≈ | OpenAI has two distinct patterns. Agents-as-tools is the hub-and-spoke pattern from the Claude chapter. | 03 |
 | Agent control points | Hooks (`PreToolUse`, `PostToolUse`, …), permission modes | Input/output guardrails, tool approvals and human review | ≈ | Guardrails validate content. Hooks intercept lifecycle events. They overlap but are not the same. | 03 |
-| Managed, hosted agent runtime | Claude Managed Agents (beta, `managed-agents-2026-04-01` header): Anthropic-managed cloud sandbox or self-hosted sandbox | Agents API (beta, `OpenAI-Beta: agents=v1`): managed Codex harness, OpenAI-hosted, self-hosted or partner sandboxes, vaults | ≈ | Same idea on both sides. The Claude chapters of this repo do not cover Managed Agents, so chapter 03 here is your first deep look at a managed runtime. | 03 |
+| Managed, hosted agent runtime | Claude Managed Agents (beta, `managed-agents-2026-04-01` header): Anthropic-managed cloud sandbox or self-hosted sandbox | Agents API (beta, `OpenAI-Beta: agents=v1`): managed Codex harness, OpenAI-hosted, self-hosted or partner sandboxes, vaults | ≈ | Same idea on both sides. The built Claude chapters do not cover Managed Agents yet (planned for Claude chapter 21), so chapter 03 here is your first deep look at a managed runtime. | 03 |
 | MCP from the API | MCP connector (`mcp_servers`, beta, remote, tools only; allowlist/denylist and per-tool config) | Remote MCP tool (`{"type": "mcp", ...}`) in Responses, plus Secure MCP Tunnel (`tunnel_id`) for private servers | = | Both call a remote MCP server for you. OpenAI adds a human approval step per tool (`require_approval`). Anthropic's MCP tunnels for private servers are still a limited research preview. | 04 |
 | MCP in the coding agent | `.mcp.json` (project) and user config | `codex mcp` commands; `~/.codex/config.toml` (user) or `.codex/config.toml` (trusted projects only) | ≈ | Different config files, same protocol | 04/05 |
 | Web search | `web_search` server tool | `web_search` hosted tool | = | — | 04 |
@@ -216,7 +235,7 @@ Use this table as your translation layer. "≈" means similar purpose but a mean
 | Project instructions file | `CLAUDE.md` (user / project / directory levels, `@path` imports, `CLAUDE.local.md`) | `AGENTS.md` (`~/.codex/AGENTS.md` global, `AGENTS.override.md`, at most one file per directory from the Git root down to the current dir, closest wins, 32 KiB combined cap by default) | ≈ | Codex has no import syntax. Once the combined size reaches `project_doc_max_bytes`, Codex stops adding further files, so keep instructions short. Claude Code (v2.1.277+) can also read `AGENTS.md` when a repo has no `CLAUDE.md`. | 05 |
 | Agent settings | `.claude/settings.json` | `~/.codex/config.toml` (user) and `.codex/config.toml` (trusted projects) | ≈ | JSON vs TOML | 05 |
 | Reusable workflows | Skills (`SKILL.md`), slash commands | Skills (Codex custom prompts are deprecated in favor of skills) | = | — | 05 |
-| Extensions bundle | Claude Code plugins | Codex plugins; ChatGPT plugins | ≈ | OpenAI publishes a guide for converting a Claude Code plugin to an OpenAI plugin | 05/14 |
+| Extensions bundle | Claude Code plugins | Codex plugins; ChatGPT plugins | ≈ | OpenAI publishes a guide for converting a Claude Code plugin to an OpenAI plugin | 05/24 |
 | Headless / CI mode | `claude -p`, `--output-format json`, `--json-schema`, `--resume` | `codex exec` (read-only by default), `--sandbox workspace-write`, `--json`, `--output-schema`, `codex exec resume --last`, key in `CODEX_API_KEY` | = | Codex exec is read-only unless you allow writes | 05 |
 | CI action | `anthropics/claude-code-action@v1` | `openai/codex-action@v1` | = | — | 05 |
 | Embedding the coding agent | Claude Agent SDK | Codex SDK (`pip install openai-codex`, Python 3.10+; `from openai_codex import Codex, Sandbox`; `AsyncCodex` for async) | ≈ | — | 05 |
@@ -225,8 +244,8 @@ Use this table as your translation layer. "≈" means similar purpose but a mean
 | Cheaper non-urgent calls | (batch only) | Flex processing (`service_tier="flex"`, beta, limited models) | — | Priced at Batch API rates but synchronous: slower, and can return `429 Resource Unavailable` when capacity is short; no 24 h queue | 07 |
 | Prompt caching | Explicit `cache_control` breakpoints on blocks, or automatic caching with one top-level `cache_control` | Automatic prefix caching by default; on GPT-5.6 and later you can also set `prompt_cache_options.mode="explicit"` and mark `prompt_cache_breakpoint`s | ≈ | Both now offer an automatic and an explicit mode. On OpenAI's default mode, caching depends on putting stable content first. | 07 |
 | Context compaction | Compaction / context editing | `context_management=[{"type": "compaction", ...}]`, auto-compaction in the Agents API | ≈ | — | 01/03/11 |
-| Realtime voice | No equivalent | Realtime API, GPT-Live | — | OpenAI only | 13 (planned) |
-| Distribution inside the chat product | Connectors (MCP) in Claude apps | ChatGPT plugins (MCP + skills + UI) | ≈ | — | 14 (planned) |
+| Realtime voice | No equivalent | Realtime API, GPT-Live | — | OpenAI only | 23 (planned) |
+| Distribution inside the chat product | Connectors (MCP) in Claude apps | ChatGPT plugins (MCP + skills + UI) | ≈ | — | 24 (planned) |
 
 > The Claude column uses the names from this repo's Claude chapters, which were checked against current Anthropic docs (Claude Managed Agents, prompt caching and the Claude Code `AGENTS.md` behavior were checked against platform.claude.com and code.claude.com on 2026-10-03). The OpenAI column was checked against developers.openai.com and learn.chatgpt.com on 2026-10-03. Both platforms change fast, so re-check before you post a comparison publicly.
 
@@ -364,10 +383,13 @@ This tracks my own study progress (the chapter content status is in [Chapter fol
 | [09 Escalation and human-in-the-loop](09-escalation-human-in-the-loop/README.md) | ⬜ | Chapter written |
 | [10 Multi-agent error handling](10-multi-agent-error-handling/README.md) | ⬜ | Chapter written |
 | [11 Context management](11-context-management/README.md) | ⬜ | Chapter written |
-| 12 Provenance | ⬜ | Chapter planned |
-| 13 Realtime and voice | ⬜ | Chapter planned |
-| 14 ChatGPT plugins and apps | ⬜ | Chapter planned |
-| Capstone project | ⬜ | |
+| 12 Provenance: citations and annotations | ⬜ | Chapter planned |
+| 13 Codex built-in tools | ⬜ | Chapter planned |
+| 14–22 Mirrors of the planned Claude chapters 14–22 | ⬜ | Chapters planned |
+| 23 Realtime and voice | ⬜ | Chapter planned |
+| 24 ChatGPT plugins and apps | ⬜ | Chapter planned |
+| [Capstones 01–04](../applied-ai-architect/capstones/README.md) (OpenAI builds) | ⬜ | Capstones written; 05–06 planned |
+| `exam-prep/` (api-pathway, codex-pathway, foundations-and-leadership) | ⬜ | Planned |
 | Academy: API pathway certificate | ⬜ | *Certificate of completion, not a certification* |
 | Academy: Codex pathway certificate | ⬜ | *Certificate of completion, not a certification* |
 | API Builder Bootcamp (optional) | ⬜ | |

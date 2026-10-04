@@ -12,6 +12,7 @@ On the Claude side you chose between writing the loop yourself and letting the C
 - [ ] Define agents with `Agent` (`name`, `instructions`, `model`, `tools`, `handoffs`, `handoff_description`, `output_type`) and run them with `Runner.run`, `Runner.run_sync`, and `Runner.run_streamed`
 - [ ] Explain how the runner decides a run is finished, and handle `MaxTurnsExceeded` (`max_turns` defaults to 10) as an error, not as a success signal
 - [ ] Write function tools with `@function_tool` and keep application state in the local run context (`RunContextWrapper`), which the model never sees
+- [ ] Plug RAG into an agent as a retrieval tool (`FileSearchTool` or your own function tool) and a fine-tuned model in as `model=`, and explain why fine-tuning changes behavior, not knowledge
 - [ ] Choose between **handoffs** (the specialist takes over) and **agents-as-tools** (`Agent.as_tool()`, the manager keeps control)
 - [ ] Add input, output, and tool guardrails, explain tripwires and `run_in_parallel`, and know which agent each guardrail type actually runs on
 - [ ] Pause a run for human review with `needs_approval`, then approve or reject from `result.to_state()` and resume the **same** run
@@ -216,6 +217,47 @@ The `ctx` parameter is **not** part of the tool schema. The SDK injects it. That
 | Tool crashes | By default the SDK sends an error message back to the model; customize with `failure_error_function` |
 
 > **Gotcha:** every agent, tool, hook, and guardrail in one run must use the **same context type**. The context is also serialized into `RunState` when a run pauses for approval (3.6), so don't put secrets in it unless you want them stored with the paused state.
+
+#### Knowledge and behavior: where RAG and fine-tuned models plug into an agent
+
+Phase 2 of OpenAI's [AI application development track](https://developers.openai.com/tracks/ai-application-development) has three parts: **building agents**, **RAG**, and **fine-tuning**. This chapter teaches the first part. The other two are not separate kinds of system. They plug into the same `Agent` at two different points:
+
+- **Knowledge (RAG) enters through a tool.** The agent retrieves facts at run time, so the answer is only as current as the index.
+- **Behavior and format (fine-tuning) enter through `model=`.** A fine-tuned model ID goes where any model name goes. The instructions, tools, guardrails, and runner code stay the same.
+
+| Building block | How it plugs into an `Agent` | Choose it when | Taught in depth |
+|---|---|---|---|
+| Hosted RAG | `tools=[FileSearchTool(vector_store_ids=[...], max_num_results=..., filters=..., ranking_options=..., include_search_results=True)]` | Your documents can live in an OpenAI vector store, and you use OpenAI models through the Responses API (the SDK's hosted tools only work there) | [Chapter 4, 4.3](../04-built-in-tools-and-mcp/README.md#43-file-search-and-vector-stores-hosted-rag) (vector stores, chunking, filters, ranking, refresh) |
+| Your own retriever as a function tool | `@function_tool def search_kb(ctx, query)` that queries your vector database. The tenant or region filter comes from `ctx.context`, never from the model | The data must stay in your store, you need your own re-ranking, or the agent runs on a non-OpenAI model (`litellm/...`) | `applied-ai-architect/06-rag-pipelines` (planned) |
+| Retrieve first, then run | Your code retrieves before `Runner.run` and puts the chunks into the input | Every question needs the same retrieval, so a model decision (and an extra turn) adds nothing | `applied-ai-architect/06-rag-pipelines` (planned) |
+| Fine-tuned model | `Agent(model="ft:gpt-4.1-nano-2025-04-14:openai::BTz2REMH", ...)` (an example ID in OpenAI's format) | Tone, style, or output format is easier to *show* with examples than to *tell* in instructions, and evals show prompting is not enough | `applied-ai-architect/05-model-strategy-and-customization` and `openai-codex/16-models-migration-and-model-optimization` (both planned) |
+
+```python
+from agents import Agent, FileSearchTool
+
+kb_agent = Agent(
+    name="Policy agent",
+    instructions="Answer only from the retrieved policy documents. Say so when they don't cover the question.",
+    model=MODEL,
+    tools=[FileSearchTool(
+        vector_store_ids=["vs_..."],                              # created and filled as in Chapter 4
+        max_num_results=4,                                       # 1-50
+        filters={"type": "eq", "key": "region", "value": "EU"},  # a hard boundary, set in code
+        include_search_results=True,                             # adds include=["file_search_call.results"]
+    )],
+)
+
+# Same agent, fine-tuned model: only the model string changes.
+styled_agent = kb_agent.clone(model="ft:gpt-4.1-nano-2025-04-14:openai::BTz2REMH")
+```
+
+**The RAG pipeline in one paragraph.** The track splits RAG into three steps. **Data preparation:** clean the documents, chunk them, embed the chunks, and store them in a vector database. **Retrieval:** turn the question into a search query and fetch the most relevant chunks, often with re-ranking. **Generation:** put the retrieved chunks into the model's context and answer from them. `FileSearchTool` (and the Responses API's `file_search` tool under it) hides all three steps: OpenAI chunks, embeds, indexes, re-ranks, and adds `file_citation` annotations. With your own retriever you build and own every step.
+
+**Fine-tuning in one paragraph.** The track names supervised fine-tuning (SFT) for strict tone, style, or format rules, preference fine-tuning (DPO) for training on preferred versus non-preferred answers, and reinforcement fine-tuning (RFT) for reasoning models with nuanced goals. All three change **behavior**. None of them is a reliable way to add facts: a model fine-tuned on last quarter's price list still answers from what it absorbed in training, cannot cite a source, and goes stale on the next price change. Facts belong in retrieval. Check availability before you plan on fine-tuning: OpenAI is winding down its fine-tuning platform. It no longer accepts new users, and existing users can create training jobs only for a limited time (dates in the [OpenAI track README](../README.md#deprecated-and-retired-do-not-learn-these)). Existing fine-tuned models keep serving until their base model is deprecated. For most new agent designs, the answer is better instructions plus retrieval plus model choice.
+
+> **Exam trap:** "The support agent gives outdated prices. The team proposes fine-tuning it on the new price list." Wrong lever: fine-tuning changes behavior, not knowledge. Put the price list behind a retrieval tool (`FileSearchTool` or your own `search_kb`) and refresh the index when prices change.
+
+> **Gotcha:** `FileSearchTool` is a **hosted** tool. It runs on OpenAI's side and works only with OpenAI models through the Responses API. If you route an agent to another provider with `litellm/...`, write retrieval as a function tool instead. In both cases put tenancy and region rules in code (`filters` on the tool, or `ctx.context` in your function), not in the prompt.
 
 ### 3.4 Handoffs vs agents-as-tools
 
@@ -677,8 +719,8 @@ Why the trace matters: in the practice notebook, a regressed desk sends a refund
 
 | Notebook | Sections covered | What you will build/run |
 |---|---|---|
-| [`01_practice.ipynb`](01_practice.ipynb) | 3.1–3.10: runtime chooser, `Runner.run` / `run_streamed`, `max_turns` and `error_handlers`, function tools and local context, handoffs vs `as_tool()`, input / output / tool guardrails (parallel vs blocking), approvals with a serialized `RunState`, sessions, `RunHooks` and a local trace processor, an Agents API session request checked against the installed SDK, a requirement-driven test suite (outcome, ownership and safety) that asserts on trace spans and catches a routing regression | **Mini-project:** a triage desk that hands off to billing and refund specialists, with a per-tier refund-limit tool guardrail, supervisor approvals above $200 (policy checked before people), a card-number output guardrail on every answering agent, an audit hook and a session. Runs offline with a scripted model; flip `RUN_LIVE` to run it on `MODEL` |
-| [`02_homework.ipynb`](02_homework.ipynb) | 3.1–3.10 | 10 scenario quiz questions (hashed answer key), 6 offline auto-graded exercises (configure a least-privilege `Agent`, a card-number output guardrail, a refund-limit tool guardrail, handoff vs agent-as-tool decisions, the approval/resume loop, a `violations()` checker that tests runs against outcome and safety requirements using trace spans) plus 1 optional live routing exercise, an architecture scenario with a rubric, and a 72% scorecard |
+| [`01_practice.ipynb`](01_practice.ipynb) | 3.1–3.10: runtime chooser, `Runner.run` / `run_streamed`, `max_turns` and `error_handlers`, function tools and local context, RAG as a region-scoped retrieval tool vs `FileSearchTool` and a fine-tuned `model=` swap, handoffs vs `as_tool()`, input / output / tool guardrails (parallel vs blocking), approvals with a serialized `RunState`, sessions, `RunHooks` and a local trace processor, an Agents API session request checked against the installed SDK, a requirement-driven test suite (outcome, ownership and safety) that asserts on trace spans and catches a routing regression | **Mini-project:** a triage desk that hands off to billing and refund specialists, with a per-tier refund-limit tool guardrail, supervisor approvals above $200 (policy checked before people), a card-number output guardrail on every answering agent, an audit hook and a session. Runs offline with a scripted model; flip `RUN_LIVE` to run it on `MODEL` |
+| [`02_homework.ipynb`](02_homework.ipynb) | 3.1–3.10 | 10 scenario quiz questions (hashed answer key), 6 offline auto-graded exercises (configure a least-privilege `Agent`, a card-number output guardrail, a refund-limit tool guardrail, handoff vs agent-as-tool decisions plus retrieval vs fine-tuned model vs instructions placement, the approval/resume loop, a `violations()` checker that tests runs against outcome and safety requirements using trace spans) plus 1 optional live routing exercise, an architecture scenario with a rubric, and a 72% scorecard |
 
 Theory stays in this README; notebooks hold code. Run them from the repo root venv (see [../../00-prerequisites/README.md](../../00-prerequisites/README.md)). Most cells use `ScriptedModel`, an offline stand-in that implements the SDK's `Model` interface, so you can learn every mechanism without API credit.
 
@@ -700,6 +742,7 @@ Theory stays in this README; notebooks hold code. Run them from the repo root ve
 | Cheap screening before an expensive agent with side-effecting tools | Input guardrail with `run_in_parallel=False` | Default parallel guardrail | The agent never starts when the tripwire fires |
 | Output must never contain card numbers, whoever answers | Output guardrail on **every** agent that can produce the final output | One guardrail on the triage agent | Output guardrails only run on the final agent |
 | Multi-worker chat backend | Shared session backend (Redis, SQLAlchemy) or `conversation_id` | In-memory `SQLiteSession` | In-memory state is per process |
+| Agent must answer from documents that change (policies, prices, manuals) | Retrieval tool: `FileSearchTool` or your own `search_kb` function tool | Fine-tuning on the documents | Retrieval adds current, citable knowledge; fine-tuning changes behavior and goes stale |
 | Regulated data in prompts and tool results | `trace_include_sensitive_data=False`, or disable tracing / use your own processor | Default tracing | Spans can carry sensitive data; tracing is unavailable under ZDR anyway |
 
 ## Common mistakes and anti-patterns
@@ -832,6 +875,18 @@ Theory stays in this README; notebooks hold code. Run them from the repo root ve
 **B.** The outcome requirement (who owns the reply) held, but the ownership and safety requirements did not: control moved twice, and for one step a specialist without refund authority owned the conversation. Handoff and function spans show this; the final text (A) and the turn count (C) do not. D is the "outcome-only test" trap from [3.10](#310-testing-agent-decisions-and-handoffs).
 </details>
 
+**Q10.** A retail support agent built with the Agents SDK quotes last month's return rules. The rules change every few weeks and are stored as documents per region. The product owner asks you to fine-tune the agent's model on the new rules. What do you propose?
+
+- A) Fine-tune on the new rules, then fine-tune again after every change
+- B) Paste all regions' rules into the agent's `instructions`
+- C) A retrieval tool on the agent (`FileSearchTool` over a vector store, or your own `search_kb` function tool), with the region filter set in code and the index refreshed when rules change
+- D) Switch the agent to a larger model so it remembers the rules better
+
+<details><summary>Answer</summary>
+
+**C.** The rules are knowledge that changes, so they belong behind retrieval, scoped by region in code ([3.3](#knowledge-and-behavior-where-rag-and-fine-tuned-models-plug-into-an-agent)). A is the "fine-tuning teaches data" misconception: fine-tuning shapes tone, style, and format, goes stale on the next change, and OpenAI's fine-tuning platform no longer accepts new users. B mixes regions and bloats every request. D changes nothing about what the model knows today.
+</details>
+
 ## Certification coverage
 
 | Requirement ID | What it asks (short) | Where in this chapter | Depth (Primary/Supporting) |
@@ -854,9 +909,10 @@ Theory stays in this README; notebooks hold code. Run them from the repo root ve
 | OAI/bootcamp/api-builder/13 | Agents: tracing | [3.8](#38-tracing-and-lifecycle-hooks), [3.10](#310-testing-agent-decisions-and-handoffs) | Primary |
 | OAI/bootcamp/api-builder/15 | From one agent to agent-as-tool delegation and multistep patterns | [3.4](#34-handoffs-vs-agents-as-tools) ("You can combine them": handoffs plus agents-as-tools, chaining, `asyncio.gather`, classifier + `if`) | Primary |
 | OAI/tracks/ai-app-development/5 | What an agent is and what it can do | [3.1](#31-choosing-a-runtime-responses-api-agents-sdk-or-agents-api) ("What counts as an agent"), [3.3](#33-function-tools-and-local-context) (tools), [3.7](#37-conversation-state-and-sessions) (context and memory) | Primary |
-| OAI/tracks/ai-app-development/10 | Phase 2: building agents, RAG, fine-tuning | The whole chapter covers the "building agents" part only; RAG and fine-tuning are not taught here | Supporting |
+| OAI/tracks/ai-app-development/10 | Phase 2: building agents, RAG, fine-tuning | Building agents: the whole chapter ([3.1](#31-choosing-a-runtime-responses-api-agents-sdk-or-agents-api)–[3.10](#310-testing-agent-decisions-and-handoffs)). How RAG and fine-tuning fit into an agent: [3.3, "Knowledge and behavior"](#knowledge-and-behavior-where-rag-and-fine-tuned-models-plug-into-an-agent) (RAG as a retrieval tool, a fine-tuned model as `model=`, the three RAG steps, SFT/DPO/RFT at a glance, platform wind-down); practice 3.3 "Knowledge and behavior" cells; homework Ex 4 part B; Self-check Q10. Tracked elsewhere: hosted file search in depth in [Chapter 4, 4.3](../04-built-in-tools-and-mcp/README.md#43-file-search-and-vector-stores-hosted-rag); the full RAG pipeline (OAI/tracks/ai-app-development/14) in `applied-ai-architect/06-rag-pipelines` (planned); fine-tuning methods and the RAG-vs-fine-tuning decision (OAI/tracks/ai-app-development/8, /15) in `applied-ai-architect/05-model-strategy-and-customization` (planned); distillation (OAI/tracks/ai-app-development/24) in `openai-codex/16-models-migration-and-model-optimization` (planned) | Primary (building agents); Supporting (RAG, fine-tuning) |
 | OAI/tracks/ai-app-development/12 | Responses API features, and the Agents SDK as a layer on top | [3.1](#31-choosing-a-runtime-responses-api-agents-sdk-or-agents-api) (the SDK is built on Responses; runtime table). The Responses API features themselves are in [Chapter 1](../01-responses-api-fundamentals/README.md) | Supporting |
 | OAI/tracks/ai-app-development/13 | Reference demos: HITL support agent, multi-agent customer service, computer-use testing agent | [3.1](#31-choosing-a-runtime-responses-api-agents-sdk-or-agents-api) (demo table mapped to sections) | Primary |
+| OAI/tracks/ai-app-development/14 | RAG pipeline steps (prepare, retrieve, generate) and the built-in file search tool | [3.3, "Knowledge and behavior"](#knowledge-and-behavior-where-rag-and-fine-tuned-models-plug-into-an-agent) (the three steps; `FileSearchTool` on an agent and what it hides; own retriever as a function tool); practice 3.3 "Knowledge and behavior" cells | Supporting (primary: planned `applied-ai-architect/06-rag-pipelines`; hosted file search: [Chapter 4, 4.3](../04-built-in-tools-and-mcp/README.md#43-file-search-and-vector-stores-hosted-rag)) |
 | OAI/tracks/building-agents/1 | Agent = instructions + guardrails + tools, acting for the user; a chatbot is not an agent | [3.1](#31-choosing-a-runtime-responses-api-agents-sdk-or-agents-api) ("What counts as an agent") | Primary |
 | OAI/tracks/building-agents/2 | Platform primitives: models, tools, state and memory, orchestration | [3.1](#31-choosing-a-runtime-responses-api-agents-sdk-or-agents-api) | Primary |
 | OAI/tracks/building-agents/5 | Responses API vs Agents SDK (state, loop, guardrails, tracing, other providers) | [3.1](#31-choosing-a-runtime-responses-api-agents-sdk-or-agents-api) (table, decision notes, `litellm/` and custom `ModelProvider`) | Primary |
