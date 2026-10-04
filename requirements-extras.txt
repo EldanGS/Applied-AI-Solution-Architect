@@ -1,0 +1,50 @@
+# Optional extras for specific later chapters. You do NOT need these to start.
+# Apart from openai-codex/05 and 06, the chapters named below are planned, not built yet.
+# Install the core set first, then add these only when a chapter asks you to:
+#
+#   pip install -r requirements.txt
+#   pip install -r requirements-extras.txt      # adds dozens of packages incl. ONNX Runtime; models download on first use
+#
+# Or install one group at a time by copying a single line into `pip install ...`.
+# Lower bounds checked against PyPI on 2026-10-03. Python 3.11+.
+# 00-prerequisites/01_practice.ipynb reports which of these are installed.
+
+# --- Local embeddings ---------------------------------------------------------
+# Used by: applied-ai-architect/06-rag-pipelines,
+#          applied-ai-architect/07-retrieval-strategy-and-knowledge-operations,
+#          applied-ai-architect/capstones/05-enterprise-rag-assistant
+# Anthropic has no first-party embedding model. A small local model keeps the RAG
+# exercises free and offline (after the first download). OpenAI's hosted embedding
+# models need no extra package (they are part of the `openai` SDK).
+fastembed>=0.8             # ONNX Runtime embedding models (no PyTorch, no GPU); downloads the model on first use
+
+# --- Local vector store -------------------------------------------------------
+# Used by: the same RAG chapters as above.
+chromadb>=1.5              # embedded vector database that persists to a local folder; no server to run
+
+# --- Lexical search for hybrid retrieval --------------------------------------
+# Used by: applied-ai-architect/06-rag-pipelines (BM25 + embeddings + reranking).
+bm25s>=0.3                 # fast BM25 keyword search (NumPy only)
+
+# --- Agent framework ----------------------------------------------------------
+# Used by: anthropic-claude/21-managed-agents-memory-and-frameworks,
+#          openai-codex/21-agents-api-memory-and-sandboxes
+# The CCDV-F exam guide names Strands, LangGraph and PydanticAI as agent frameworks.
+# The repo uses PydanticAI (Claude and OpenAI providers only, to keep it small).
+pydantic-ai-slim[anthropic,openai]>=2.54
+# Alternative, not needed by any notebook: langgraph>=1.2 (LangChain's graph-based agent runtime).
+
+# --- Promptfoo (Node.js tool, not a pip package) ------------------------------
+# Referenced by: openai-codex/06-prompt-engineering-and-evals (its notebooks build the same
+#                harness in plain Python, so Promptfoo stays optional there),
+#                applied-ai-architect/09-experimentation-and-release-gates
+# Promptfoo is an open-source CLI for prompt/model regression tests. It needs Node.js 22.22+
+# (the "engines" field of promptfoo 0.123.1 on npm, checked 2026-10-03). Nothing to pip install.
+#   Run without installing:  npx promptfoo@latest eval
+#   Or install globally:     npm install -g promptfoo
+
+# --- Codex SDK for Python (commented out on purpose) ---------------------------
+# Used by: openai-codex/05-codex (optional SDK cells; the notebook checks for it and skips them if absent).
+# Left commented because it pins a Codex CLI runtime (openai-codex-cli-bin) and SDK runs use your
+# OpenAI account. Uncomment or install it by hand only when you reach that chapter:
+# openai-codex>=0.160        # import name: openai_codex; Python 3.10+; source: github.com/openai/codex

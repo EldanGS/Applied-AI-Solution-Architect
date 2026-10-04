@@ -1,0 +1,36 @@
+# Shared Python dependencies for every notebook in this repo.
+# Python 3.11+ required (ipykernel>=7.4 needs >=3.11; the SDKs need >=3.10).
+#
+# Install:
+#   python -m venv .venv && source .venv/bin/activate     # Windows: .venv\Scripts\activate
+#   python -m pip install --upgrade pip
+#   pip install -r requirements.txt
+#
+# Pins are lower bounds checked against PyPI on 2026-10-03.
+# Upper bounds are left open on purpose so you get fixes; if a notebook
+# breaks after an upgrade, freeze a known-good set with `pip freeze > requirements.lock`.
+#
+# Optional per-chapter extras (embeddings, vector store, agent framework) live in
+# requirements-extras.txt; install them only when a chapter asks you to.
+
+# --- Anthropic (Claude) -------------------------------------------------------
+anthropic>=1.11            # Claude API client SDK (Messages, token counting, batches, files)
+claude-agent-sdk>=0.2.163  # Claude Agent SDK; bundles the Claude Code CLI binary, no Node.js needed
+mcp>=2.3                   # Model Context Protocol Python SDK (servers + clients)
+
+# --- OpenAI -------------------------------------------------------------------
+openai>=3.24               # OpenAI API client SDK (Responses API, token counting)
+openai-agents>=0.23        # OpenAI Agents SDK (import name: `agents`)
+
+# --- Shared utilities ---------------------------------------------------------
+python-dotenv>=1.2         # load API keys from .env
+pydantic>=2.13             # typed models / JSON Schema generation for structured output
+httpx2>=2.13               # raw HTTP calls (import name: `httpx2`); the maintained successor of
+                           # httpx and the HTTP client the anthropic/openai/mcp SDKs now use
+httpx>=0.28                # classic HTTP client (import name: `httpx`); a few notebooks import it
+                           # directly, so it is listed explicitly instead of relying on jupyterlab
+pyyaml>=6.0                # YAML files: CI workflows, eval cases, agent configs (import name: `yaml`)
+
+# --- Notebooks ----------------------------------------------------------------
+jupyterlab>=4.6
+ipykernel>=7.4
