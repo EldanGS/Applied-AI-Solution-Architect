@@ -1,0 +1,810 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Applied AI in the Real World</title>
+<style>
+  :root {
+    --ivory: #ffffff;
+    --oat: #e8e6dc;
+    --cloud: #f5f4ef;
+    --slate: #141413;
+    --slate-2: #3d3d3a;
+    --gray: #87867f;
+    --clay: #d97757;
+    --clay-deep: #c6613f;
+    --olive: #788c5d;
+    --sky: #6a9bcc;
+    --fig: #c46686;
+    --serif: "Tiempos Headline", "Source Serif 4", "Iowan Old Style", Georgia, "Times New Roman", serif;
+    --sans: "Styrene A", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    --mono: "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; background: #1b1b1a; overflow: hidden; font-family: var(--sans); }
+
+  /* ---------- stage: fixed 1280x720, scaled to fit ---------- */
+  #stage {
+    position: absolute; left: 50%; top: 50%;
+    width: 1280px; height: 720px;
+    transform-origin: center center;
+    background: var(--ivory);
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,.45);
+  }
+  .slide {
+    position: absolute; inset: 0;
+    padding: 64px 80px 56px;
+    display: flex; flex-direction: column;
+    opacity: 0; visibility: hidden;
+    transform: translateY(10px);
+    transition: opacity .35s ease, transform .35s ease, visibility 0s .35s;
+    color: var(--slate);
+    background: var(--ivory);
+  }
+  .slide.active { opacity: 1; visibility: visible; transform: none; transition-delay: 0s; }
+  .slide.dark { background: var(--slate); color: var(--ivory); }
+  .slide.clay { background: var(--clay); color: var(--ivory); }
+
+  /* ---------- type ---------- */
+  .eyebrow {
+    font-size: 15px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--clay-deep); margin-bottom: 18px;
+  }
+  .dark .eyebrow { color: var(--clay); }
+  .clay .eyebrow { color: rgba(250,249,245,.85); }
+  h1, h2 { font-family: var(--serif); font-weight: 500; letter-spacing: -.015em; line-height: 1.08; }
+  h1 { font-size: 84px; }
+  h2 { font-size: 46px; max-width: 1060px; }
+  h2 em, h1 em { font-style: italic; color: var(--clay-deep); }
+  .dark h2 em, .dark h1 em { color: var(--clay); }
+  h3 { font-family: var(--serif); font-weight: 500; font-size: 28px; line-height: 1.2; margin-bottom: 8px; }
+  p, li { font-size: 22px; line-height: 1.45; color: var(--slate-2); }
+  .dark p, .dark li { color: #c9c8c0; }
+  .lede { font-size: 26px; line-height: 1.4; max-width: 880px; margin-top: 22px; }
+  .small { font-size: 17px; line-height: 1.4; }
+  .muted { color: var(--gray); }
+  strong { color: var(--slate); font-weight: 600; }
+  .dark strong { color: var(--ivory); }
+  code, .mono { font-family: var(--mono); font-size: .86em; background: var(--oat); padding: 1px 7px; border-radius: 5px; color: var(--slate); }
+  .dark code { background: #2a2a28; color: var(--ivory); }
+
+  .body { flex: 1; display: flex; flex-direction: column; justify-content: flex-start; margin-top: 34px; min-height: 0; }
+  .cols { display: grid; gap: 28px; }
+  .c2 { grid-template-columns: 1fr 1fr; }
+  .c3 { grid-template-columns: repeat(3, 1fr); }
+  .c4 { grid-template-columns: repeat(4, 1fr); }
+  .c-wide-left { grid-template-columns: 1.15fr 1fr; }
+
+  .card {
+    background: var(--cloud); border: 1px solid var(--oat); border-radius: 18px;
+    padding: 26px 28px;
+  }
+  .card p, .card li { font-size: 19px; }
+  .card h3 { font-size: 25px; }
+  .dark .card { background: #1f1f1d; border-color: #33332f; }
+  .card .num { font-family: var(--serif); font-size: 44px; color: var(--clay-deep); line-height: 1; margin-bottom: 12px; display: block; }
+  .tag {
+    display: inline-block; font-size: 13px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase;
+    padding: 4px 11px; border-radius: 999px; background: var(--oat); color: var(--slate-2); margin-bottom: 12px;
+  }
+  .tag.clay { background: var(--clay); color: #fff; }
+  .tag.olive { background: var(--olive); color: #fff; }
+  .tag.sky { background: var(--sky); color: #fff; }
+  .tag.slate { background: var(--slate); color: var(--ivory); }
+
+  ul.clean { list-style: none; }
+  ul.clean li { padding-left: 24px; position: relative; margin-bottom: 10px; }
+  ul.clean li::before { content: ""; position: absolute; left: 0; top: .6em; width: 9px; height: 9px; border-radius: 50%; background: var(--clay); }
+
+  pre.code {
+    background: var(--slate); color: #ece9df; border-radius: 16px; padding: 24px 28px;
+    font-family: var(--mono); font-size: 18px; line-height: 1.55; overflow: hidden; white-space: pre;
+  }
+  pre.code .k { color: #e8a58b; } pre.code .s { color: #a9c48a; } pre.code .c { color: #8a897f; } pre.code .n { color: #8fb7de; }
+
+  .callout {
+    border-left: 5px solid var(--clay); background: var(--cloud); border-radius: 0 14px 14px 0;
+    padding: 18px 24px; font-size: 21px; line-height: 1.4; color: var(--slate);
+  }
+  .dark .callout { background: #1f1f1d; color: var(--ivory); }
+  .footer-line { margin-top: auto; padding-top: 20px; font-size: 21px; color: var(--slate-2); }
+
+  /* slide chrome */
+  .chrome { position: absolute; left: 80px; right: 80px; bottom: 24px; display: flex; justify-content: space-between; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--gray); pointer-events: none; }
+  .dark .chrome { color: #6b6a64; } .clay .chrome { color: rgba(250,249,245,.7); }
+
+
+  /* ---------- diagram bits ---------- */
+  .flow { display: flex; align-items: stretch; gap: 14px; }
+  .node {
+    flex: 1; background: var(--cloud); border: 1px solid var(--oat); border-radius: 14px;
+    padding: 16px 14px; text-align: center; font-size: 18px; line-height: 1.3; color: var(--slate);
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  .node.hl { background: var(--clay); color: #fff; border-color: var(--clay); }
+  .node.dk { background: var(--slate); color: var(--ivory); border-color: var(--slate); }
+  .node.hl strong, .node.dk strong { color: inherit; }
+  .node small { display: block; font-size: 14px; opacity: .75; margin-top: 4px; }
+  .arrow { align-self: center; font-size: 26px; color: var(--clay-deep); }
+
+  .bars .row { display: flex; align-items: center; gap: 16px; margin-bottom: 14px; }
+  .bars .lbl { width: 90px; font-size: 17px; color: var(--slate-2); }
+  .bars .track { flex: 1; display: flex; height: 44px; border-radius: 10px; overflow: hidden; background: var(--cloud); }
+  .seg { display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; color: #fff; }
+  .seg.sys { background: var(--clay); } .seg.hist { background: var(--olive); } .seg.new { background: var(--slate); }
+  .legend { display: flex; gap: 22px; font-size: 16px; color: var(--slate-2); margin-top: 6px; }
+  .legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 8px; vertical-align: -1px; }
+
+  table.t { width: 100%; border-collapse: collapse; }
+  table.t td { padding: 9px 0; border-bottom: 1px solid var(--oat); font-size: 19px; color: var(--slate-2); vertical-align: top; }
+  table.t td:first-child { width: 210px; padding-right: 20px; font-weight: 600; color: var(--slate); }
+  .dark table.t td { border-color: #33332f; color: #c9c8c0; } .dark table.t td:first-child { color: var(--ivory); }
+
+
+  /* ---------- UI chrome outside stage ---------- */
+  #progress { position: fixed; left: 0; top: 0; height: 4px; background: var(--clay); width: 0; transition: width .3s; z-index: 5; }
+  #notes {
+    position: fixed; left: 0; right: 0; bottom: 0; height: 170px; background: #111110; color: #d8d6cc;
+    border-top: 1px solid #333; padding: 14px 28px; display: none; overflow: auto; z-index: 4;
+    font-size: 17px; line-height: 1.5;
+  }
+  #notes .meta { font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: var(--clay); margin-bottom: 8px; }
+  body.notes-on #notes { display: block; }
+  #help {
+    position: fixed; right: 16px; top: 14px; font-size: 12px; color: #77766f; font-family: var(--sans);
+    letter-spacing: .04em; z-index: 5; pointer-events: none;
+  }
+  .notes-src { display: none; }
+
+  @media print {
+    @page { size: 1280px 720px; margin: 0; }
+    html, body { overflow: visible; height: auto; background: #fff; }
+    #stage { position: static; transform: none !important; width: 1280px; height: auto; box-shadow: none; overflow: visible; }
+    .slide { position: relative; width: 1280px; height: 720px; opacity: 1; visibility: visible; transform: none; page-break-after: always; break-after: page; }
+    #progress, #notes, #help { display: none !important; }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ---------- level ladder ---------- */
+  .layer { display: flex; align-items: center; gap: 28px; border-radius: 18px; padding: 20px 30px; margin-bottom: 14px; }
+  .layer .lab { width: 250px; flex: none; font-family: var(--serif); font-size: 30px; line-height: 1.15; }
+  .layer .lab small { display: block; font-family: var(--sans); font-size: 14px; letter-spacing: .1em; text-transform: uppercase; opacity: .75; margin-bottom: 4px; }
+  .layer .items { font-size: 21px; line-height: 1.5; }
+  .layer .items em { font-style: normal; opacity: .75; display: block; font-size: 17px; }
+  .layer.l3 { background: var(--slate); color: var(--ivory); }
+  .layer.l2 { background: var(--clay); color: #fff; }
+  .layer.l1 { background: var(--cloud); border: 1px solid var(--oat); color: var(--slate); }
+
+  .c5 { grid-template-columns: repeat(5, 1fr); }
+  .stat { font-family: var(--serif); font-size: 64px; line-height: 1; color: var(--clay-deep); }
+  .stat-l { font-size: 17px; line-height: 1.35; color: var(--slate-2); margin-top: 8px; }
+  .step-n { font-family: var(--serif); font-size: 15px; letter-spacing: .1em; text-transform: uppercase; color: var(--clay-deep); margin-bottom: 8px; display: block; }
+  table.t th { text-align: left; font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: var(--gray); font-weight: 600; padding: 0 0 8px; border-bottom: 2px solid var(--oat); }
+  table.t.v td { font-size: 18px; padding: 8px 0; }
+  table.t.v td:first-child { width: 230px; }
+  table.t.v td:nth-child(2) { width: 430px; padding-right: 20px; }
+  .card table.t td { font-size: 17px; padding: 7px 0; }
+  .card table.t td:first-child { width: 110px; padding-right: 12px; }
+  .chrome { align-items: center; }
+  .soc { display: inline-flex; align-items: center; gap: 20px; text-transform: none; letter-spacing: .02em; }
+  .soc a { color: inherit; text-decoration: none; display: inline-flex; align-items: center; gap: 7px; pointer-events: auto; }
+  .soc svg { width: 18px; height: 18px; flex: none; }
+  .chrome .soc { font-size: 14px; }
+  .hero .chrome .soc { visibility: hidden; }
+  .social .soc { font-size: 19px; gap: 26px; }
+  .social .soc svg { width: 26px; height: 26px; }
+  .social .soc a { color: inherit; }
+  .soc .x rect { fill: #000; } .soc .x path { fill: #fff; }
+  .dark .soc .x rect { fill: #fff; } .dark .soc .x path { fill: #000; }
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<div id="help">← → navigate · N notes · F fullscreen</div>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><radialGradient id="ig-grad" cx="30%" cy="107%" r="150%"><stop offset="0" stop-color="#fdf497"/><stop offset=".05" stop-color="#fdf497"/><stop offset=".45" stop-color="#fd5949"/><stop offset=".6" stop-color="#d6249f"/><stop offset=".9" stop-color="#285aeb"/></radialGradient></defs></svg>
+
+<div id="stage">
+
+<!-- 1 · TITLE -->
+<section class="slide dark hero" data-min="0.5">
+  <div class="eyebrow">Applied AI · A practical guide for engineers</div>
+  <div style="margin-top:auto">
+    <h1>Build AI that works<br>in the <em>real world</em></h1>
+    <p class="lede" style="color:#c9c8c0">From calling a model to shipping reliable AI systems. For anyone with a technical background who is ready for the next level.</p>
+  </div>
+  <div style="margin-top:56px; display:flex; justify-content:space-between; align-items:center; color:#87867f; font-size:17px;">
+    <span style="display:flex; gap:14px; align-items:center"><span style="width:12px;height:12px;border-radius:50%;background:var(--clay);display:inline-block"></span>Under 30 minutes · Claude and OpenAI · Vendor-neutral concepts</span>
+    <span class="social"><span class="soc"><a href="https://www.instagram.com/eldan.nomad/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="6" fill="url(#ig-grad)"/><circle cx="12" cy="12" r="4.3" fill="none" stroke="#fff" stroke-width="2"/><circle cx="17.4" cy="6.6" r="1.3" fill="#fff"/></svg>@eldan.nomad</a><a href="https://www.youtube.com/@eldan_nomad" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="1" y="4.5" width="22" height="15" rx="4.5" fill="#ff0000"/><path d="M10 8.6 16 12l-6 3.4z" fill="#fff"/></svg>@eldan_nomad</a><a class="x" href="https://x.com/eldan_nomad" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="1.5" y="1.5" width="21" height="21" rx="5"/><path transform="translate(6 6) scale(.5)" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>@eldan_nomad</a></span></span>
+  </div>
+  <div class="notes-src">Welcome. This is not a course about a job title. It is about how AI systems are actually built and shipped: the software basics, how models behave, the AI fundamentals, the building blocks, and what it takes to run them in production. Everything is shown on both Claude and OpenAI, because the concepts carry over.</div>
+</section>
+
+<!-- 2 · LEVELS -->
+<section class="slide" data-min="1">
+  <div class="eyebrow">Why this matters</div>
+  <h2>Most engineers <em>use</em> AI. Few can <em>ship</em> it.</h2>
+  <div class="body">
+    <div class="layer l3"><div class="lab"><small>Level 3</small>Ship</div><div class="items">Evals · cost · reliability · safety · real users<em>You own the outcome in production.</em></div></div>
+    <div class="layer l2"><div class="lab"><small>Level 2</small>Build</div><div class="items">APIs · tools · retrieval · agents · MCP<em>You write the system around the model.</em></div></div>
+    <div class="layer l1"><div class="lab"><small>Level 1</small>Use</div><div class="items">Chat assistants · copilots · coding agents<em>You prompt someone else’s product.</em></div></div>
+    <div class="footer-line">This session takes you from level 1 to level 3.</div>
+  </div>
+  <div class="notes-src">Ask the audience where they are today. Most technical people are at level 1: they use ChatGPT, Claude or a coding agent daily. Level 2 is writing code around the model. Level 3 is where the value is: a system that real users rely on, with evals, a budget, failure handling and safety. Level 3 is the daily work of Applied AI Architects, Applied AI Engineers and Forward Deployed Engineers, but it applies to any engineer shipping AI features.</div>
+</section>
+
+<!-- 3 · ROADMAP -->
+<section class="slide" data-min="0.5">
+  <div class="eyebrow">Roadmap</div>
+  <h2>Five parts, from the floor to the field</h2>
+  <div class="body">
+    <div class="cols c5" style="gap:16px">
+      <div class="card" style="padding:22px 20px"><span class="num" style="font-size:38px">1</span><h3 style="font-size:22px">Prerequisites</h3><p class="small">Software + AI fundamentals</p></div>
+      <div class="card" style="padding:22px 20px"><span class="num" style="font-size:38px">2</span><h3 style="font-size:22px">How LLMs behave</h3><p class="small">Tokens, context, generation, grounding</p></div>
+      <div class="card" style="padding:22px 20px"><span class="num" style="font-size:38px">3</span><h3 style="font-size:22px">Building blocks</h3><p class="small">Prompts, tools, RAG, agents, MCP</p></div>
+      <div class="card" style="padding:22px 20px"><span class="num" style="font-size:38px">4</span><h3 style="font-size:22px">Production</h3><p class="small">Evals, cost, retries, security</p></div>
+      <div class="card" style="padding:22px 20px; border-color:var(--clay)"><span class="num" style="font-size:38px">5</span><h3 style="font-size:22px">Real world</h3><p class="small">Four builds, delivery, your path</p></div>
+    </div>
+    <div class="callout" style="margin-top:28px"><strong>Bonus at the end:</strong> how the same skills map to a Claude certification or an OpenAI Academy certificate.</div>
+  </div>
+  <div class="notes-src">Five parts. Part 1 is the prerequisites: software and AI fundamentals. Part 2 is the mental model. Part 3 is the toolbox. Part 4 is what separates a demo from a system. Part 5 puts it together in real projects. The certification is a bonus: build first, and the exam ends up testing what you already do.</div>
+</section>
+
+<!-- 4 · SWE -->
+<section class="slide" data-min="1.25">
+  <div class="eyebrow">Part 1 · Software prerequisites</div>
+  <h2>Software skills: the <em>floor</em>, not the goal</h2>
+  <div class="body">
+    <div class="cols c3" style="gap:18px">
+      <div class="card" style="padding:20px 24px"><h3 style="font-size:23px">Code</h3><p class="small">Typed, async <strong>Python</strong>. Read <strong>TypeScript</strong> fluently: SDK and MCP samples.</p></div>
+      <div class="card" style="padding:20px 24px"><h3 style="font-size:23px">APIs &amp; contracts</h3><p class="small">HTTP, REST, status codes. <strong>JSON Schema</strong> + Pydantic: the contract for tools and outputs.</p></div>
+      <div class="card" style="padding:20px 24px"><h3 style="font-size:23px">Git &amp; review</h3><p class="small">Branch, small commits, PR, review. No secrets in history.</p></div>
+      <div class="card" style="padding:20px 24px"><h3 style="font-size:23px">Testing &amp; CI/CD</h3><p class="small">Automated tests, pipelines, GitHub Actions.</p></div>
+      <div class="card" style="padding:20px 24px"><h3 style="font-size:23px">Cloud &amp; containers</h3><p class="small">Docker, one major cloud, infrastructure as code.</p></div>
+      <div class="card" style="padding:20px 24px"><h3 style="font-size:23px">Security basics</h3><p class="small">Secrets, least privilege, OAuth and SSO concepts.</p></div>
+    </div>
+    <div class="callout" style="margin-top:24px; font-size:20px"><strong>Bar:</strong> read code you didn’t write, ship small, know which errors to <strong>fix</strong> (400, 401, 404) vs <strong>retry</strong> (429, 5xx, 529).</div>
+  </div>
+  <div class="notes-src">Keep this short. Python is the working language; TypeScript is reading fluency because many SDK and MCP examples use it. Git and CI matter because coding agents run inside pipelines. Errors: client errors are fixed, transient errors are retried with backoff. Trap: a 429 from a monthly spend cap has no retry-after header and keeps failing; alert a human. JSON Schema is the shape behind tool inputs, structured outputs and MCP tools; generate it with Pydantic instead of hand-writing it. Plus-level extras: SQL, queues and events, Kubernetes.</div>
+</section>
+
+<!-- 5 · AI PREREQUISITES -->
+<section class="slide" data-min="1.75">
+  <div class="eyebrow">Part 1 · AI prerequisites</div>
+  <h2>AI fundamentals: <em>intuition</em>, not a PhD</h2>
+  <div class="body">
+    <div class="cols c3" style="gap:18px">
+      <div class="card" style="padding:20px 24px"><h3 style="font-size:23px">ML basics</h3><p class="small">Training vs inference. Train / test split, overfitting. Why held-out data becomes your <strong>eval set</strong>.</p></div>
+      <div class="card" style="padding:20px 24px"><h3 style="font-size:23px">How LLMs are made</h3><p class="small">Pretraining → instruction tuning → RLHF. Explains the knowledge cutoff and the confident tone.</p></div>
+      <div class="card" style="padding:20px 24px"><h3 style="font-size:23px">Transformer intuition</h3><p class="small">Tokens → embeddings → <strong>attention</strong> → next-token probabilities. Concept, not derivation.</p></div>
+      <div class="card" style="padding:20px 24px; border-color:var(--clay)"><h3 style="font-size:23px">Embeddings &amp; vectors</h3><p class="small">Meaning as a vector. <strong>Cosine similarity</strong>, nearest neighbours. The basis of RAG and search.</p></div>
+      <div class="card" style="padding:20px 24px"><h3 style="font-size:23px">Probability &amp; metrics</h3><p class="small">Sampling and variance. <strong>Precision, recall, F1.</strong> Pass rate over N runs, not one demo.</p></div>
+      <div class="card" style="padding:20px 24px"><h3 style="font-size:23px">Data handling</h3><p class="small">pandas and SQL. Clean, sample, label a small <strong>gold set</strong>. Most AI work is data work.</p></div>
+    </div>
+    <div class="callout" style="margin-top:24px; font-size:20px"><strong>Not required:</strong> training models from scratch, heavy math, CUDA. <strong>Fine-tuning comes last</strong>, after prompting, RAG and evals.</div>
+  </div>
+  <div class="notes-src">The AI side of the floor. You are an engineer who uses models, not a researcher who trains them, so you need intuition. ML basics: held-out data is the idea behind every eval set. How LLMs are made explains behaviour: pretraining on text gives knowledge with a cutoff date, instruction tuning and RLHF make the model helpful and fluent, which is why it sounds confident even when it is wrong. Transformer intuition: attention lets each token look at every other token in the context. Embeddings and cosine similarity are the whole of semantic search. Metrics: precision, recall and F1 for classification, pass rate over several runs for generation. And daily tool fluency: use Claude Code, Codex or ChatGPT for real work every day. Good free starting points: Andrej Karpathy's Intro to LLMs, 3Blue1Brown's neural network series, Google's ML Crash Course.</div>
+</section>
+
+<!-- 6 · TOKENS -->
+<section class="slide" data-min="1">
+  <div class="eyebrow">Part 2 · Tokens</div>
+  <h2>Models read <em>tokens</em>, not words. You pay in tokens.</h2>
+  <div class="body">
+    <p class="lede" style="margin-top:0; font-size:23px">Rule of thumb for English: <strong>~4 characters ≈ 0.75 words ≈ 1 token.</strong> Code and other languages differ.</p>
+    <div class="cols c4" style="margin-top:28px">
+      <div class="card"><h3>Billing</h3><p>Per million input and output tokens. Output is ~5× the price of input.</p></div>
+      <div class="card"><h3>Limits</h3><p>Context window, <code>max_tokens</code> and rate limits are all counted in tokens.</p></div>
+      <div class="card"><h3>Tokenizers differ</h3><p>By vendor and by model generation. Never reuse another model’s count.</p></div>
+      <div class="card"><h3>Hidden tokens</h3><p>Tool definitions, system prompts and thinking all count. Thinking is billed as output.</p></div>
+    </div>
+    <div class="footer-line">Count first: <code>client.messages.count_tokens(…)</code> · <code>client.responses.input_tokens.count(…)</code></div>
+  </div>
+  <div class="notes-src">Why you care: billing, limits, and the fact that tokenizers differ. Newer Claude models produce roughly 30% more tokens for the same text than older ones. Hidden tokens are where budgets leak: a big tool list or heavy thinking can dominate the bill.</div>
+</section>
+
+<!-- 7 · CONTEXT -->
+<section class="slide" data-min="1">
+  <div class="eyebrow">Part 2 · Context window</div>
+  <h2>The API is <em>stateless</em>. Context is the only memory you control.</h2>
+  <div class="body">
+    <div class="cols c-wide-left" style="align-items:start">
+      <div class="bars">
+        <div class="row"><span class="lbl">Turn 1</span><div class="track"><div class="seg sys" style="width:18%">system</div><div class="seg new" style="width:10%">new</div></div></div>
+        <div class="row"><span class="lbl">Turn 2</span><div class="track"><div class="seg sys" style="width:18%">system</div><div class="seg hist" style="width:22%">history</div><div class="seg new" style="width:10%">new</div></div></div>
+        <div class="row"><span class="lbl">Turn 3</span><div class="track"><div class="seg sys" style="width:18%">system</div><div class="seg hist" style="width:46%">history</div><div class="seg new" style="width:10%">new</div></div></div>
+        <div class="row"><span class="lbl">Turn 4</span><div class="track"><div class="seg sys" style="width:18%">system</div><div class="seg hist" style="width:68%">history</div><div class="seg new" style="width:10%">new</div></div></div>
+        <div class="legend"><span><i style="background:var(--clay)"></i>system + tools</span><span><i style="background:var(--olive)"></i>resent history</span><span><i style="background:var(--slate)"></i>this turn</span></div>
+        <p class="small muted" style="margin-top:14px">Window = system + tools + history + documents + <strong>the output itself</strong>.</p>
+      </div>
+      <ul class="clean">
+        <li><strong>Cost and latency grow</strong> with conversation length, unless you trim, summarize or cache.</li>
+        <li><strong>More context isn’t better.</strong> Slower, pricier, and details in the middle get missed. Curate.</li>
+        <li><strong>If the model must know it,</strong> it’s in the window or reachable by a tool.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="notes-src">The model remembers nothing between calls. Every turn you resend system prompt, tools and history. Current flagship models have windows around 1M tokens; that tempts people to dump everything in. Lost-in-the-middle and cost say: curate.</div>
+</section>
+
+<!-- 8 · NEXT TOKEN -->
+<section class="slide" data-min="1.25">
+  <div class="eyebrow">Part 2 · Generation</div>
+  <h2>One token at a time, so test <em>properties</em>, not strings</h2>
+  <div class="body">
+    <div class="flow">
+      <div class="node">Context<small>input + tokens so far</small></div><span class="arrow">→</span>
+      <div class="node">Probabilities<small>for every next token</small></div><span class="arrow">→</span>
+      <div class="node hl">Sample one</div><span class="arrow">→</span>
+      <div class="node">Append<small>repeat until stop</small></div>
+    </div>
+    <div class="cols c4" style="margin-top:24px">
+      <div class="card" style="padding:20px 22px"><h3 style="font-size:22px">Latency</h3><p class="small">Output tokens, including thinking, drive response time. Hence streaming.</p></div>
+      <div class="card" style="padding:20px 22px"><h3 style="font-size:22px">Variation</h3><p class="small">Same prompt, different text. Steer with <code>effort</code>, not temperature.</p></div>
+      <div class="card" style="padding:20px 22px"><h3 style="font-size:22px">No take-backs</h3><p class="small">An early wrong token shapes the rest. Reason first, then answer.</p></div>
+      <div class="card" style="padding:20px 22px"><h3 style="font-size:22px">Truncation</h3><p class="small">Check <code>stop_reason</code> / <code>status</code>. Always.</p></div>
+    </div>
+    <div class="callout" style="margin-top:22px"><strong>Test properties:</strong> it parses · matches the schema · contains the required facts · stays under the limit · <strong>pass rate over N runs</strong>.</div>
+  </div>
+  <div class="notes-src">This one loop explains latency, variation, brittleness and truncation. The practical takeaway: never assert exact output strings. Use property checks plus a pass rate, and a small eval set you re-run on every prompt or model change. Steering: on Claude 4.7 and later, non-default temperature, top_p or top_k return a 400; set reasoning depth with output_config effort (low to max), and OpenAI exposes the same idea as reasoning. Responses can start with thinking blocks, so select output by block type, never content[0].</div>
+</section>
+
+<!-- 9 · HALLUCINATION -->
+<section class="slide" data-min="1">
+  <div class="eyebrow">Part 2 · Grounding</div>
+  <h2>Hallucination is fluent output that isn’t <em>grounded</em></h2>
+  <div class="body">
+    <div class="cols c5" style="gap:16px">
+      <div class="card" style="padding:22px 20px"><span class="num" style="font-size:36px">1</span><h3 style="font-size:23px">Ground</h3><p class="small">Put the source in context or give a retrieval tool. Answer only from it.</p></div>
+      <div class="card" style="padding:22px 20px"><span class="num" style="font-size:36px">2</span><h3 style="font-size:23px">Give an exit</h3><p class="small">Allow “I don’t know” and nullable fields.</p></div>
+      <div class="card" style="padding:22px 20px"><span class="num" style="font-size:36px">3</span><h3 style="font-size:23px">Ask for evidence</h3><p class="small">Quotes and citations you can check in code.</p></div>
+      <div class="card" style="padding:22px 20px"><span class="num" style="font-size:36px">4</span><h3 style="font-size:23px">Validate</h3><p class="small">Schema + business rules. Retry with the error as feedback.</p></div>
+      <div class="card" style="padding:22px 20px"><span class="num" style="font-size:36px">5</span><h3 style="font-size:23px">Measure</h3><p class="small">A small eval set and a trend line, not spot checks.</p></div>
+    </div>
+    <div class="footer-line">The model is optimized for <strong>plausible</strong> continuations, not verified ones. Your system supplies the verification.</div>
+  </div>
+  <div class="notes-src">The model is not a database. Five mitigations that show up in every real project. Emphasize 2 and 4 together: a nullable schema plus a validation-and-retry loop is the cheapest big win.</div>
+</section>
+
+<!-- 10 · PROMPT ANATOMY -->
+<section class="slide" data-min="1.25">
+  <div class="eyebrow">Part 3 · Prompt &amp; context engineering</div>
+  <h2>A prompt is <em>code</em>: structure it, version it</h2>
+  <div class="body">
+    <div class="cols c-wide-left" style="align-items:start">
+      <table class="t">
+        <tr><th>Put it in</th><th>What goes there</th></tr>
+        <tr><td><code>system</code></td><td>Role, stable rules, criteria, examples, output format</td></tr>
+        <tr><td><code>user</code></td><td>Long documents <strong>first</strong>, the question <strong>last</strong></td></tr>
+        <tr><td>Tool description</td><td>When to use it, what it returns, its limits</td></tr>
+        <tr><td><code>tool_result</code></td><td>Data only. <strong>Untrusted</strong>, never instructions</td></tr>
+      </table>
+      <ul class="clean">
+        <li><strong>Clear and direct.</strong> Would a colleague with no context get it?</li>
+        <li>One <strong>XML tag</strong> per content type: <code>&lt;documents&gt;</code>, <code>&lt;examples&gt;</code></li>
+        <li>Explicit criteria, plus <strong>the reason</strong> behind each rule</li>
+        <li><strong>Few-shot examples</strong> for format and edge cases</li>
+        <li>Template + <strong>version ID</strong>, logged with every request</li>
+      </ul>
+    </div>
+    <div class="callout" style="margin-top:22px; font-size:20px"><strong>Cache-friendly order:</strong> static prefix first (system, examples, policy), per-request parts last. Cheaper and faster.</div>
+  </div>
+  <div class="notes-src">Context engineering is deciding what goes where. Each place carries a different authority: the system prompt is the operator, tool results are third-party data. Treat prompts like code: modular, versioned, tied to eval runs. Putting stable content first lets prompt caching cut cost and time to first token.</div>
+</section>
+
+<!-- 11 · TOOL USE -->
+<section class="slide" data-min="1.5">
+  <div class="eyebrow">Part 3 · Tool use</div>
+  <h2>The model <em>asks</em>. Your code <em>acts</em>.</h2>
+  <div class="body">
+    <div class="flow">
+      <div class="node">Request<small>messages + tool schemas</small></div><span class="arrow">→</span>
+      <div class="node hl">Model asks for a tool<small>name + JSON arguments</small></div><span class="arrow">→</span>
+      <div class="node">Your code<small>validates, runs it</small></div><span class="arrow">→</span>
+      <div class="node">Result back<small>into the context</small></div><span class="arrow">→</span>
+      <div class="node dk">Final answer<small>or another call</small></div>
+    </div>
+    <div class="cols c2" style="margin-top:24px; gap:20px">
+      <pre class="code" style="font-size:16px; padding:18px 22px"><span class="c"># Claude · Messages API</span>
+stop_reason == <span class="s">"tool_use"</span>
+  ← tool_use{<span class="n">id</span>, name, input}
+  → tool_result{<span class="n">tool_use_id</span>, content}</pre>
+      <pre class="code" style="font-size:16px; padding:18px 22px"><span class="c"># OpenAI · Responses API</span>
+output item <span class="s">"function_call"</span>
+  ← function_call{<span class="n">call_id</span>, name, arguments}
+  → function_call_output{<span class="n">call_id</span>, output}</pre>
+    </div>
+    <div class="callout" style="margin-top:22px; font-size:20px"><code>strict: true</code> guarantees <strong>well-formed</strong> arguments. Whether the call is <strong>allowed</strong> is still your code’s job.</div>
+  </div>
+  <div class="notes-src">Tool use is where a model stops being a text generator and starts acting on real systems. The model never runs your code; it returns a request. Same loop on both vendors, only the names differ. Reliability comes in layers: good descriptions for tool choice, strict schemas for well-formed arguments, and your own code for business rules and approvals.</div>
+</section>
+
+<!-- 12 · RAG -->
+<section class="slide" data-min="1">
+  <div class="eyebrow">Part 3 · Retrieval (RAG)</div>
+  <h2>Find the relevant chunks, <em>then</em> put them in context</h2>
+  <div class="body">
+    <p class="small muted" style="margin-bottom:10px">Index time</p>
+    <div class="flow">
+      <div class="node">Documents</div><span class="arrow">→</span>
+      <div class="node">Chunk + embed<small>meaning → vector</small></div><span class="arrow">→</span>
+      <div class="node dk">Vector store</div>
+    </div>
+    <p class="small muted" style="margin:22px 0 10px">Query time</p>
+    <div class="flow">
+      <div class="node">Question</div><span class="arrow">→</span>
+      <div class="node hl">Hybrid search<small>semantic + keyword, rerank</small></div><span class="arrow">→</span>
+      <div class="node">Prompt<small>instructions + chunks + question</small></div><span class="arrow">→</span>
+      <div class="node dk">LLM<small>grounded, cited answer</small></div>
+    </div>
+    <div class="footer-line">Measure <strong>retrieval</strong> and <strong>answer</strong> quality separately, so you know which stage fails.</div>
+  </div>
+  <div class="notes-src">An embedding is a vector representing meaning; nearby vectors mean similar text. RAG finds the most relevant chunks and puts them in the context window: a concrete way to ground the model. In practice, hybrid search (semantic plus BM25 keyword) and reranking beat pure vector search. Vendor note: Anthropic has no first-party embedding model (its docs point to Voyage AI); OpenAI offers embeddings, vector stores and a hosted file_search tool.</div>
+</section>
+
+<!-- 13 · WORKFLOW VS AGENT -->
+<section class="slide dark" data-min="0.75">
+  <div class="eyebrow">Part 3 · Agents</div>
+  <h2>Use the <em>simplest thing</em> that works</h2>
+  <div class="body">
+    <div class="cols c3" style="align-items:end">
+      <div class="card" style="min-height:200px"><span class="tag olive">Start here</span><h3>Single call</h3><p>One well-prompted request. Most problems end here.</p></div>
+      <div class="card" style="min-height:260px"><span class="tag sky">Steps known</span><h3>Workflow</h3><p>You hard-code the sequence of calls. Predictable, testable.</p></div>
+      <div class="card" style="min-height:320px; border-color:var(--clay)"><span class="tag clay">Path unpredictable</span><h3>Agent</h3><p>A model in a loop with tools. Always set a <strong>max-turns</strong> limit.</p></div>
+    </div>
+    <div class="footer-line" style="color:#c9c8c0">Agents trade <strong>predictability, latency and cost</strong> for flexibility. Climb only when forced.</div>
+  </div>
+  <div class="notes-src">From Anthropic's Building effective agents: workflows are orchestrated by your code, agents direct their own process. Start with a single call, move to a workflow when the steps are known, and use an agent only when the path really cannot be predicted. Runaway tool loops are the most common surprise bill.</div>
+</section>
+
+<!-- 14 · PATTERNS -->
+<section class="slide" data-min="1">
+  <div class="eyebrow">Part 3 · Patterns</div>
+  <h2>Five patterns cover <em>most</em> real systems</h2>
+  <div class="body">
+    <div class="cols c5" style="gap:16px">
+      <div class="card" style="padding:22px 20px"><span class="tag">Fixed steps</span><h3 style="font-size:22px">Prompt chaining</h3><p class="small">Output of one call feeds the next, with a check in between.</p></div>
+      <div class="card" style="padding:22px 20px"><span class="tag">Classify first</span><h3 style="font-size:22px">Routing</h3><p class="small">Send each input to the right prompt or a cheaper model.</p></div>
+      <div class="card" style="padding:22px 20px"><span class="tag">At once</span><h3 style="font-size:22px">Parallelization</h3><p class="small">Split into sections, or vote across several runs.</p></div>
+      <div class="card" style="padding:22px 20px; border-color:var(--clay)"><span class="tag clay">Dynamic</span><h3 style="font-size:22px">Orchestrator-workers</h3><p class="small">A lead model splits the task and delegates to subagents.</p></div>
+      <div class="card" style="padding:22px 20px"><span class="tag">Loop</span><h3 style="font-size:22px">Evaluator-optimizer</h3><p class="small">Generate, critique against criteria, refine.</p></div>
+    </div>
+    <div class="footer-line">Combine them. A router in front of a chain is already a production system. <span class="muted">Source: Anthropic, “Building effective agents”.</span></div>
+  </div>
+  <div class="notes-src">These five workflow patterns come from Anthropic's Building effective agents and map directly onto real projects. Prompt chaining for fixed pipelines, routing to send easy cases to a cheap model, parallelization for speed or confidence, orchestrator-workers for research-style tasks, evaluator-optimizer when quality can be judged against clear criteria.</div>
+</section>
+
+<!-- 15 · ENFORCEMENT -->
+<section class="slide" data-min="1">
+  <div class="eyebrow">Part 3 · Guardrails</div>
+  <h2>Prompts <em>guide</em>. Code <em>enforces</em>.</h2>
+  <div class="body">
+    <div class="cols c-wide-left" style="align-items:start">
+      <div class="card" style="border-color:var(--clay)">
+        <div class="stat">≈ 50 / day</div>
+        <p style="margin-top:14px">An agent that verifies identity <strong>99.5%</strong> of the time, at <strong>10,000</strong> refund chats a day, still lets about <strong>50 unverified refunds</strong> through. Every day.</p>
+      </div>
+      <table class="t">
+        <tr><th></th><th>Use it for</th></tr>
+        <tr><td>Prompt guidance<br><span class="small muted">probabilistic</span></td><td>Tone, judgment, when to offer what</td></tr>
+        <tr><td>Code enforcement<br><span class="small muted">deterministic</span></td><td>Ordering, identity, money limits, compliance, irreversible actions</td></tr>
+        <tr><td>Human approval</td><td>Destructive or high-value actions</td></tr>
+      </table>
+    </div>
+    <div class="footer-line">Gate state comes from <strong>tool results</strong>, never from what the model says.</div>
+  </div>
+  <div class="notes-src">The most important design rule for agents that act on real systems. Better prompts lower the failure rate; they never make it zero. When a single violation has financial, legal or safety consequences, put the rule in code: a prerequisite gate or hook that blocks the refund tool until identity is verified, and a hard limit that routes large refunds to a human.</div>
+</section>
+
+<!-- 16 · MCP -->
+<section class="slide" data-min="1.25">
+  <div class="eyebrow">Part 3 · Model Context Protocol</div>
+  <h2>MCP: one protocol to connect <em>any tool</em></h2>
+  <div class="body">
+    <div class="flow">
+      <div class="node dk">Host app<small>Claude Code · ChatGPT · Codex · your agent</small></div><span class="arrow">⇄</span>
+      <div class="node hl">MCP client<small>one per server</small></div><span class="arrow">⇄</span>
+      <div class="node">MCP servers<small>GitHub · Postgres · your internal API</small></div>
+    </div>
+    <div class="cols c3" style="margin-top:24px; gap:18px">
+      <div class="card" style="padding:20px 24px"><span class="tag clay">Model-controlled</span><h3 style="font-size:23px">Tools</h3><p class="small">Actions the model decides to call.</p></div>
+      <div class="card" style="padding:20px 24px"><span class="tag sky">App-controlled</span><h3 style="font-size:23px">Resources</h3><p class="small">Read-only data by URI. Cuts exploratory calls.</p></div>
+      <div class="card" style="padding:20px 24px"><span class="tag olive">User-controlled</span><h3 style="font-size:23px">Prompts</h3><p class="small">Reusable templates, like slash commands.</p></div>
+    </div>
+    <div class="footer-line">Transports: <code>stdio</code> for local servers, <strong>Streamable HTTP</strong> for remote. Supported by both Claude and OpenAI.</div>
+  </div>
+  <div class="notes-src">Think USB-C for AI applications: the host does not care whether the other end is GitHub, Postgres or your pricing service, as long as it speaks MCP. Write an integration once, use it in Claude Code, the Agent SDK, the Claude API connector, the OpenAI Responses API, the Agents SDK and Codex. Pick the primitive by who controls it. Run third-party servers with least privilege, ideally in a container.</div>
+</section>
+
+<!-- 17 · VENDOR MAP -->
+<section class="slide" data-min="0.75">
+  <div class="eyebrow">Part 3 · Claude and OpenAI</div>
+  <h2>Learn the concept once, <em>map the names</em></h2>
+  <div class="body" style="margin-top:26px">
+    <table class="t v">
+      <tr><th>Concept</th><th>Claude</th><th>OpenAI</th></tr>
+      <tr><td>Core call</td><td>Messages API</td><td>Responses API</td></tr>
+      <tr><td>Structured output</td><td>Strict tools, <code>output_config.format</code></td><td>Strict functions, Structured Outputs</td></tr>
+      <tr><td>Agent runtime</td><td>Claude Agent SDK</td><td>OpenAI Agents SDK</td></tr>
+      <tr><td>Multi-agent</td><td>Coordinator + subagents</td><td>Agents-as-tools or handoffs</td></tr>
+      <tr><td>Policy enforcement</td><td>Hooks, permission modes</td><td>Guardrails, tool approvals</td></tr>
+      <tr><td>Retrieval</td><td>Bring your own retriever</td><td>Embeddings, vector stores, <code>file_search</code></td></tr>
+      <tr><td>Coding agent</td><td>Claude Code</td><td>Codex</td></tr>
+    </table>
+  </div>
+  <div class="notes-src">The architecture is the same; the names differ. Learn one platform deeply first, then use this table to translate. When you talk to a customer, talk in the left column: the concept. The vendor choice comes after the design.</div>
+</section>
+
+<!-- 18 · EVALS -->
+<section class="slide" data-min="1.5">
+  <div class="eyebrow">Part 4 · Evals</div>
+  <h2>If you can’t measure it, you can’t <em>ship</em> it</h2>
+  <div class="body">
+    <div class="flow">
+      <div class="node">Success criteria<small>per use case</small></div><span class="arrow">→</span>
+      <div class="node">Dataset<small>real, representative</small></div><span class="arrow">→</span>
+      <div class="node hl">Graders<small>code + LLM judge</small></div><span class="arrow">→</span>
+      <div class="node">Release gate<small>every prompt or model change</small></div><span class="arrow">→</span>
+      <div class="node dk">Monitor<small>online, by segment</small></div>
+    </div>
+    <div class="cols c3" style="margin-top:26px; gap:18px">
+      <div class="card" style="padding:22px 24px"><h3 style="font-size:23px">Code graders first</h3><p class="small">Parses, matches schema, right label, has the facts. Cheap and exact.</p></div>
+      <div class="card" style="padding:22px 24px"><h3 style="font-size:23px">Calibrate the judge</h3><p class="small">Check an LLM judge against human labels before you trust it.</p></div>
+      <div class="card" style="padding:22px 24px; border-color:var(--clay)"><h3 style="font-size:23px">Eval before prompt</h3><p class="small">Write the test set first. Then every change is a measured decision.</p></div>
+    </div>
+  </div>
+  <div class="notes-src">Evals are the most requested technical skill in applied AI work, because they let you say 'this works' to a customer, switch models safely and justify a cheaper model. Report a pass rate over several runs, slice results by segment, and gate every prompt or model change on the eval set.</div>
+</section>
+
+<!-- 19 · LEVERS -->
+<section class="slide" data-min="1">
+  <div class="eyebrow">Part 4 · Trade-offs</div>
+  <h2>Cost, latency, reliability: pick your <em>levers</em></h2>
+  <div class="body">
+    <div class="cols c3" style="gap:18px">
+      <div class="card" style="padding:20px 24px"><span class="tag clay">Cost</span><ul class="clean small"><li>Curate context first</li><li>Prompt caching</li><li>Batch API, ~50% off</li><li>Smaller model, lower effort</li></ul></div>
+      <div class="card" style="padding:20px 24px"><span class="tag sky">Latency</span><ul class="clean small"><li>Stream the output</li><li>Run independent calls async</li><li>Shorter outputs</li><li>Route easy cases to a fast model</li></ul></div>
+      <div class="card" style="padding:20px 24px"><span class="tag olive">Reliability</span><ul class="clean small"><li>Retries + backoff + jitter</li><li>Idempotency keys on side effects</li><li>Schema validation</li><li>Fallbacks and timeouts</li></ul></div>
+    </div>
+    <div class="callout" style="margin-top:24px; font-size:20px"><strong>Curated context</strong> is the one lever that improves all three. Downgrade a model only after the evals agree.</div>
+  </div>
+  <div class="notes-src">You can usually buy one of cost, latency and reliability with the other two. Batch is the big cost lever when latency doesn't matter. Streaming changes perceived latency only. Shorter, curated context is cheaper, faster and often better. Reliability: both SDKs retry for you, so tune max_retries and timeout. A timeout does not say whether a side effect ran, so refunds, emails and tickets need an idempotency key.</div>
+</section>
+
+<!-- 20 · COST EXAMPLE -->
+<section class="slide" data-min="1">
+  <div class="eyebrow">Part 4 · Estimate before you ship</div>
+  <h2>1,000 requests on Sonnet 5.5: <em>$9</em> by default</h2>
+  <div class="body">
+    <p class="small muted" style="margin-bottom:18px">2,000 input + 500 output tokens each · $2 / $10 per million tokens · prices checked 2026-10-03</p>
+    <div class="bars">
+      <div class="row"><span class="lbl" style="width:170px">Standard</span><div class="track"><div class="seg sys" style="width:100%;font-size:18px">$9.00</div></div></div>
+      <div class="row"><span class="lbl" style="width:170px">Cached prompt</span><div class="track"><div class="seg hist" style="width:70%;font-size:18px">≈ $6.30 + one-time cache write</div></div></div>
+      <div class="row"><span class="lbl" style="width:170px">Batch API</span><div class="track"><div class="seg new" style="width:50%;font-size:18px">$4.50</div></div></div>
+    </div>
+    <div class="cols c2" style="margin-top:26px">
+      <div class="callout" style="font-size:19px"><code>2M × $2</code> + <code>0.5M × $10</code> = <strong>$4 + $5</strong>. Output is half the bill from a fifth of the tokens.</div>
+      <div class="callout" style="font-size:19px">Cache reads cost <strong>10%</strong> of input price. 1,500 of 2,000 tokens cached: input drops $4 → ~$1.30.</div>
+    </div>
+  </div>
+  <div class="notes-src">Do the arithmetic live. Standard: 2M input tokens at $2 plus 0.5M output tokens at $10 is $9. Batch halves it. Caching 1,500 of the 2,000 input tokens: 0.5M × $2 plus 1.5M × $0.20 = $1.30 input, about $6.30 total plus a one-time cache write. Re-check the pricing page before any real estimate, and remember thinking tokens are billed as output.</div>
+</section>
+
+<!-- 21 · OBSERVABILITY + SECURITY -->
+<section class="slide" data-min="1">
+  <div class="eyebrow">Part 4 · Operate it</div>
+  <h2>You can’t defend what you can’t <em>see</em></h2>
+  <div class="body">
+    <div class="cols c2" style="align-items:start">
+      <div>
+        <span class="tag">Log on every model call</span>
+        <pre class="code" style="font-size:16px; padding:18px 22px; line-height:1.5">{
+  <span class="n">"model"</span>: <span class="s">"claude-sonnet-5-5"</span>,
+  <span class="n">"prompt_version"</span>: <span class="s">"refund-v12"</span>,
+  <span class="n">"request_id"</span>: <span class="s">"req_…"</span>,
+  <span class="n">"latency_ms"</span>: 1840,
+  <span class="n">"input_tokens"</span>: 1250, <span class="n">"output_tokens"</span>: 310,
+  <span class="n">"stop_reason"</span>: <span class="s">"end_turn"</span>,
+  <span class="n">"estimated_cost_usd"</span>: 0.0056,
+  <span class="n">"attempt"</span>: 1
+}</pre>
+      </div>
+      <div>
+        <span class="tag clay">Security basics</span>
+        <ul class="clean">
+          <li><strong>Prompt injection:</strong> documents, web pages and tool results can carry instructions. Treat them as data.</li>
+          <li><strong>Least privilege:</strong> read-only tools by default.</li>
+          <li><strong>Secrets</strong> in a vault, one key per environment.</li>
+          <li><strong>Privacy:</strong> redact PII before storing prompts.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="notes-src">Request IDs let vendor support find your call. Cost per call, per user and per feature catches runaway loops early. stop_reason tells you about truncation. For agents, traces link model call, tool call, model call; OpenTelemetry is the neutral standard. Security: stable trusted instructions in the system layer, everything else is data.</div>
+</section>
+
+<!-- 22 · FOUR BUILDS -->
+<section class="slide" data-min="1.25">
+  <div class="eyebrow">Part 5 · Real-world builds</div>
+  <h2>Four systems companies <em>actually</em> ship</h2>
+  <div class="body" style="margin-top:28px">
+    <div class="cols c2" style="gap:18px">
+      <div class="card" style="padding:20px 26px"><h3 style="font-size:24px">Customer support agent</h3><p class="small">Tools for orders and refunds · identity gate in code · refund limit routes to a human · structured handoff.</p></div>
+      <div class="card" style="padding:20px 26px"><h3 style="font-size:24px">Multi-agent research</h3><p class="small">Orchestrator + subagents · every claim mapped to a source · conflicting data flagged, not hidden.</p></div>
+      <div class="card" style="padding:20px 26px"><h3 style="font-size:24px">Document extraction at scale</h3><p class="small">Strict schema with nullable fields · validate and retry with feedback · Batch API for 50% off.</p></div>
+      <div class="card" style="padding:20px 26px"><h3 style="font-size:24px">Coding agents for a team</h3><p class="small">Claude Code or Codex · shared conventions in <code>CLAUDE.md</code> / <code>AGENTS.md</code> · review in CI · least privilege.</p></div>
+    </div>
+    <div class="footer-line">Same building blocks every time: <strong>schema, tools, grounding, evals, guardrails, cost.</strong></div>
+  </div>
+  <div class="notes-src">These four are real patterns, and each one matches an official Claude certification scenario. Build at least one end to end, ideally on both Claude and OpenAI. Notice that none of them is a novel model trick: they are ordinary software with an LLM in the right place, guarded by code and measured by evals.</div>
+</section>
+
+<!-- 23 · DELIVERY -->
+<section class="slide" data-min="1">
+  <div class="eyebrow">Part 5 · Delivery</div>
+  <h2>Real-world AI is a <em>delivery</em> problem</h2>
+  <div class="body">
+    <div class="flow">
+      <div class="node">Discover<small>the real problem</small></div><span class="arrow">→</span>
+      <div class="node">Define success<small>criteria + value</small></div><span class="arrow">→</span>
+      <div class="node">Prototype<small>simplest thing</small></div><span class="arrow">→</span>
+      <div class="node hl">Prove<small>evals, cost</small></div><span class="arrow">→</span>
+      <div class="node">Ship<small>handoff, runbook</small></div><span class="arrow">→</span>
+      <div class="node dk">Learn<small>monitor, feed back</small></div>
+    </div>
+    <div class="cols c3" style="margin-top:26px; gap:18px">
+      <div class="card" style="padding:20px 24px"><h3 style="font-size:23px">Own the ambiguity</h3><p class="small">Turn “we want AI” into a scoped problem with a number attached.</p></div>
+      <div class="card" style="padding:20px 24px"><h3 style="font-size:23px">Explain trade-offs</h3><p class="small">Same truth for an engineer, an executive and a user.</p></div>
+      <div class="card" style="padding:20px 24px"><h3 style="font-size:23px">Finish the last mile</h3><p class="small">Security review, docs, SLAs. The POC is the easy part.</p></div>
+    </div>
+    <div class="footer-line">This loop is the daily work of <strong>Applied AI Architects, Applied AI Engineers</strong> and <strong>Forward Deployed Engineers</strong>.</div>
+  </div>
+  <div class="notes-src">The technology is the easier half. Projects fail on unclear success criteria, no evaluation, and the gap between a demo and a production system with security reviews and an owner. Whatever your title, practise this loop: scope, measure, ship, learn. This is exactly what applied AI roles do every day.</div>
+</section>
+
+<!-- 24 · CERTIFICATION BONUS -->
+<section class="slide" data-min="1">
+  <div class="eyebrow">Bonus · Certification</div>
+  <h2>Build first. Then make it <em>official</em>.</h2>
+  <div class="body" style="margin-top:28px">
+    <div class="cols c2" style="gap:20px; align-items:start">
+      <div class="card" style="padding:22px 26px">
+        <span class="tag clay">Claude · proctored certifications</span>
+        <table class="t">
+          <tr><td>CCDV-F</td><td>Developer, Foundations · 53 items</td></tr>
+          <tr><td>CCAR-F</td><td>Architect, Foundations · 60 items</td></tr>
+          <tr><td>CCAR-P</td><td>Architect, Professional · 63 items</td></tr>
+        </table>
+        <p class="small muted" style="margin-top:10px">120 min · pass 720 / 1,000 · valid 12 months</p>
+      </div>
+      <div class="card" style="padding:22px 26px">
+        <span class="tag">OpenAI Academy · free</span>
+        <table class="t">
+          <tr><td>API</td><td>5 courses: scope, evals, agents, RAG, optimize</td></tr>
+          <tr><td>Codex</td><td>3 courses: start, extend, scale</td></tr>
+        </table>
+        <p class="small muted" style="margin-top:10px">80% per assessment · certificates of completion, <strong>not</strong> certifications</p>
+      </div>
+    </div>
+    <div class="footer-line">CCAR-F: agents <strong>27%</strong> · Claude Code 20% · prompts 20% · tools &amp; MCP 18% · context 15%</div>
+  </div>
+  <div class="notes-src">The bonus. Claude has proctored, scenario-based certifications: Developer Foundations for hands-on builders, Architect Foundations for people designing production Claude apps, and Architect Professional for senior architects. OpenAI has no architect certification; the Academy issues free course badges and pathway certificates of completion, which OpenAI says are not certifications. Be precise about that wording. Every CCAR-F domain was covered in parts 3 and 4 of this session. Facts checked 2026-10-03; re-check before booking.</div>
+</section>
+
+<!-- 25 · PATH -->
+<section class="slide" data-min="0.75">
+  <div class="eyebrow">Your next level</div>
+  <h2>Four steps from <em>using</em> to <em>shipping</em></h2>
+  <div class="body">
+    <div class="flow" style="align-items:stretch">
+      <div class="node" style="text-align:left; align-items:flex-start; padding:20px"><span class="step-n">Step 1</span><strong>Foundations</strong><small>Python, APIs, ML basics, embeddings, tokens</small></div><span class="arrow">→</span>
+      <div class="node" style="text-align:left; align-items:flex-start; padding:20px"><span class="step-n">Step 2</span><strong>One vendor, deep</strong><small>Tools, agents, MCP on Claude or OpenAI</small></div><span class="arrow">→</span>
+      <div class="node hl" style="text-align:left; align-items:flex-start; padding:20px"><span class="step-n" style="color:#fff">Step 3</span><strong>Production skills</strong><small>Evals, cost, security, observability</small></div><span class="arrow">→</span>
+      <div class="node dk" style="text-align:left; align-items:flex-start; padding:20px"><span class="step-n" style="color:var(--clay)">Step 4</span><strong>Real builds</strong><small>One real problem, end to end, both stacks</small></div>
+    </div>
+    <div class="cols c2" style="margin-top:26px">
+      <div class="card"><h3>Build in public</h3><p class="small">Post each build: what you made, what failed, what you changed. That is your portfolio.</p></div>
+      <div class="card" style="border-color:var(--clay)"><h3>Follow along</h3><p class="small">Chapters, notebooks and capstones:<br><code>github.com/EldanGS/Applied-AI-Solution-Architect</code></p><p class="social" style="margin-top:12px"><span class="soc"><a href="https://www.instagram.com/eldan.nomad/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="6" fill="url(#ig-grad)"/><circle cx="12" cy="12" r="4.3" fill="none" stroke="#fff" stroke-width="2"/><circle cx="17.4" cy="6.6" r="1.3" fill="#fff"/></svg>@eldan.nomad</a><a href="https://www.youtube.com/@eldan_nomad" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="1" y="4.5" width="22" height="15" rx="4.5" fill="#ff0000"/><path d="M10 8.6 16 12l-6 3.4z" fill="#fff"/></svg>@eldan_nomad</a><a class="x" href="https://x.com/eldan_nomad" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="1.5" y="1.5" width="21" height="21" rx="5"/><path transform="translate(6 6) scale(.5)" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>@eldan_nomad</a></span></p></div>
+    </div>
+  </div>
+  <div class="notes-src">Go deep on one vendor before comparing. Then production skills, then real builds. A certification proves the mechanics; a shipped project with an honest write-up proves you can deliver. Point viewers to the repo for the notebooks behind every slide.</div>
+</section>
+
+<!-- 26 · CLOSE -->
+<section class="slide dark hero" data-min="0.75">
+  <div class="eyebrow">Self-check</div>
+  <h2>If you can do these, you’re at the <em>next level</em></h2>
+  <div class="body">
+    <div class="cols c3">
+      <div class="card"><h3>Build it</h3><ul class="clean"><li>A tool-using agent with strict schemas</li><li>RAG with citations</li><li>Retries and idempotency keys</li></ul></div>
+      <div class="card"><h3>Prove it</h3><ul class="clean"><li>An eval set and a pass rate</li><li>Cost per request from tokens</li><li>Guardrails enforced in code</li></ul></div>
+      <div class="card"><h3>Ship it</h3><ul class="clean"><li>Scope a vague problem</li><li>Explain the trade-offs</li><li>Hand off to production</li></ul></div>
+    </div>
+    <div class="callout" style="margin-top:28px"><strong>Your move:</strong> pick one real problem this week. Build the simplest version, measure it, and share what you learned.</div>
+    <div class="social" style="margin-top:26px; display:flex; align-items:center; gap:26px; color:#c9c8c0"><span style="font-size:15px; letter-spacing:.14em; text-transform:uppercase; color:var(--clay); font-weight:600">Follow the journey</span><span class="soc"><a href="https://www.instagram.com/eldan.nomad/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="6" fill="url(#ig-grad)"/><circle cx="12" cy="12" r="4.3" fill="none" stroke="#fff" stroke-width="2"/><circle cx="17.4" cy="6.6" r="1.3" fill="#fff"/></svg>@eldan.nomad</a><a href="https://www.youtube.com/@eldan_nomad" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="1" y="4.5" width="22" height="15" rx="4.5" fill="#ff0000"/><path d="M10 8.6 16 12l-6 3.4z" fill="#fff"/></svg>@eldan_nomad</a><a class="x" href="https://x.com/eldan_nomad" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="1.5" y="1.5" width="21" height="21" rx="5"/><path transform="translate(6 6) scale(.5)" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>@eldan_nomad</a></span></div>
+  </div>
+  <div class="notes-src">Close with three verbs: build it, prove it, ship it. Software and AI skills get you to build and prove. Delivery gets you to ship. The certification follows naturally once you have done the work. Leave time for questions.</div>
+</section>
+
+</div><!-- /stage -->
+
+<div id="notes"><div class="meta"></div><div class="text"></div></div>
+<script>
+(function () {
+  var stage = document.getElementById('stage');
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var bar = document.getElementById('progress');
+  var notes = document.getElementById('notes');
+  var NOTES_H = 170;
+  var total = slides.reduce(function (a, s) { return a + parseFloat(s.dataset.min || 1); }, 0);
+  var cur = 0;
+  var SOC = document.querySelector('.social .soc').outerHTML;
+
+  slides.forEach(function (s, i) {
+    var chrome = document.createElement('div');
+    chrome.className = 'chrome';
+    chrome.innerHTML = SOC + '<span>Applied AI · ' + (i + 1) + ' / ' + slides.length + '</span>';
+    s.appendChild(chrome);
+  });
+
+  function fit() {
+    var availH = window.innerHeight - (document.body.classList.contains('notes-on') ? NOTES_H : 0);
+    var s = Math.min(window.innerWidth / 1280, availH / 720);
+    stage.style.transform = 'translate(-50%, -50%) scale(' + s + ')';
+    stage.style.top = (availH / 2) + 'px';
+  }
+
+  function render() {
+    slides.forEach(function (s, i) { s.classList.toggle('active', i === cur); });
+    bar.style.width = ((cur + 1) / slides.length * 100) + '%';
+    var elapsed = 0;
+    for (var i = 0; i < cur; i++) elapsed += parseFloat(slides[i].dataset.min || 1);
+    var src = slides[cur].querySelector('.notes-src');
+    notes.querySelector('.meta').textContent =
+      'Slide ' + (cur + 1) + '/' + slides.length + ' · ~' + slides[cur].dataset.min + ' min here · target elapsed ' + elapsed.toFixed(1) + ' of ' + total.toFixed(1) + ' min';
+    notes.querySelector('.text').textContent = src ? src.textContent : '';
+    try { history.replaceState(null, '', '#' + (cur + 1)); } catch (e) {}
+  }
+
+  function go(n) { cur = Math.max(0, Math.min(slides.length - 1, n)); render(); }
+
+  document.addEventListener('keydown', function (e) {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    switch (e.key) {
+      case 'ArrowRight': case 'ArrowDown': case 'PageDown': case ' ': case 'Enter': e.preventDefault(); go(cur + 1); break;
+      case 'ArrowLeft': case 'ArrowUp': case 'PageUp': case 'Backspace': e.preventDefault(); go(cur - 1); break;
+      case 'Home': go(0); break;
+      case 'End': go(slides.length - 1); break;
+      case 'n': case 'N': document.body.classList.toggle('notes-on'); fit(); break;
+      case 'f': case 'F':
+        if (!document.fullscreenElement) document.documentElement.requestFullscreen && document.documentElement.requestFullscreen();
+        else document.exitFullscreen();
+        break;
+    }
+  });
+
+  stage.addEventListener('click', function (e) {
+    if (e.target.closest('a')) return;
+    var r = stage.getBoundingClientRect();
+    go(e.clientX - r.left < r.width * 0.25 ? cur - 1 : cur + 1);
+  });
+
+  var tx = null;
+  document.addEventListener('touchstart', function (e) { tx = e.touches[0].clientX; }, { passive: true });
+  document.addEventListener('touchend', function (e) {
+    if (tx === null) return;
+    var dx = e.changedTouches[0].clientX - tx;
+    if (Math.abs(dx) > 40) go(cur + (dx < 0 ? 1 : -1));
+    tx = null;
+  });
+
+  window.addEventListener('resize', fit);
+  var h = parseInt((location.hash || '').slice(1), 10);
+  if (h >= 1 && h <= slides.length) cur = h - 1;
+  fit(); render();
+})();
+</script>
+</body>
+</html>
