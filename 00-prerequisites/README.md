@@ -391,8 +391,8 @@ If it is older, install a current version from [python.org](https://www.python.o
 ### Step 2 — Clone the repo and create a virtual environment
 
 ```bash
-git clone https://github.com/<your-handle>/AI-solution-architect.git
-cd AI-solution-architect
+git clone https://github.com/EldanGS/Applied-AI-Solution-Architect.git
+cd Applied-AI-Solution-Architect
 
 python3 -m venv .venv
 source .venv/bin/activate          # Windows (PowerShell): .venv\Scripts\Activate.ps1
@@ -705,7 +705,7 @@ Day 0 of my AI Solution Architect journey (Anthropic + OpenAI): foundations.
 3. Retries, idempotency and logging aren't optional. They separate a demo from a system.
 
 Env set up, spend limits on, first "hello" from both Claude and OpenAI.
-Notes + notebooks: https://github.com/<your-handle>/AI-solution-architect
+Notes + notebooks: https://github.com/EldanGS/Applied-AI-Solution-Architect
 #AIArchitecture #ClaudeAI #OpenAI #LLM #BuildInPublic
 ```
 

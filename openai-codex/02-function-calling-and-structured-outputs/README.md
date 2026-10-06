@@ -813,7 +813,7 @@ Same loop as Claude, different wiring.
 2. Strict mode = every field required. "Optional" means required + nullable.
 3. A schema guarantees shape, not truth. Refusals, truncation and bad totals still need code.
 
-Notes + notebooks: https://github.com/<your-handle>/AI-solution-architect
+Notes + notebooks: https://github.com/EldanGS/Applied-AI-Solution-Architect
 #OpenAI #AIArchitecture #LLM #FunctionCalling #BuildInPublic
 ```
 

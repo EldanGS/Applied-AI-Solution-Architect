@@ -839,7 +839,7 @@ Week 3 of my AI Solution Architect journey: I built a multi-agent system with th
 2. Subagents start with a blank context. Pass everything they need in the prompt
 3. Rules that touch money or compliance go in hooks, not prompts. Hooks run on every call; prompts only usually get followed
 
-Notes + notebooks: https://github.com/<your-handle>/AI-solution-architect
+Notes + notebooks: https://github.com/EldanGS/Applied-AI-Solution-Architect
 #ClaudeAI #AIAgents #SolutionArchitect #LearningInPublic
 ```
 

@@ -859,7 +859,7 @@ OpenAI branch, chapter 1: the Responses API.
 2. There is no stop_reason. Check status + incomplete_details, and never trust output[0].
 3. max_output_tokens includes reasoning. Set it too low and you pay for an empty answer.
 
-Notes + notebooks: https://github.com/<your-handle>/AI-solution-architect
+Notes + notebooks: https://github.com/EldanGS/Applied-AI-Solution-Architect
 #OpenAI #AIArchitecture #LLM #BuildInPublic
 ```
 

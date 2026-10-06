@@ -407,7 +407,7 @@ So my plan is:
 2. A public notebook for every concept, mapped 1:1 to what I learned on Claude
 3. Watching the formal OpenAI Certification and Partner Network tracks
 
-Claude <-> OpenAI translation table in the repo: https://github.com/<your-handle>/AI-solution-architect/tree/main/openai-codex
+Claude <-> OpenAI translation table in the repo: https://github.com/EldanGS/Applied-AI-Solution-Architect/tree/main/openai-codex
 #OpenAI #Codex #AIArchitecture #LLM #BuildInPublic
 ```
 

@@ -870,7 +870,7 @@ The model never runs your code. It asks, your code executes, and you report back
 2. strict: true fixes syntax, not truth. Totals can still be wrong, so validate.
 3. Make fields nullable, or the model will invent data to fill them.
 
-Notes + notebooks: https://github.com/<your-handle>/AI-solution-architect
+Notes + notebooks: https://github.com/EldanGS/Applied-AI-Solution-Architect
 #ClaudeAI #Anthropic #AIArchitecture #LLM #BuildInPublic
 ```
 

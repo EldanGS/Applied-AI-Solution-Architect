@@ -945,7 +945,7 @@ Chapter 3 of my OpenAI path: agents with the OpenAI Agents SDK, plus the new man
 2. Input guardrails run only on the first agent, output guardrails only on the last. Refund limits go on the tool
 3. Approvals pause the run; you resume the same RunState, not a new chat turn
 
-Notes + notebooks: https://github.com/<your-handle>/AI-solution-architect
+Notes + notebooks: https://github.com/EldanGS/Applied-AI-Solution-Architect
 #OpenAI #AIAgents #SolutionArchitect #LearningInPublic
 ```
 

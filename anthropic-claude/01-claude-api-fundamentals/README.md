@@ -797,7 +797,7 @@ Day 1 of my AI Solution Architect journey: the Claude Messages API.
 2. stop_reason is the real control signal, and there are now 7 values, not 4.
 3. A 1M-token window is not a strategy. Curate the context; don't stuff it.
 
-Notes + notebooks: https://github.com/<your-handle>/AI-solution-architect
+Notes + notebooks: https://github.com/EldanGS/Applied-AI-Solution-Architect
 #ClaudeAI #Anthropic #AIArchitecture #LLM #BuildInPublic
 ```
 

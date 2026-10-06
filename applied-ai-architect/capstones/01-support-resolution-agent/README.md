@@ -438,7 +438,7 @@ Same MCP server, same refund policy, two agent stacks.
 2. One policy function, native adapters: PreToolUse hooks on Claude, tool guardrails + needs_approval on OpenAI.
 3. FCR alone rewards never escalating. Pair it with escalation recall, violations and cost per ticket including people.
 
-Notes + notebooks: https://github.com/<your-handle>/AI-solution-architect
+Notes + notebooks: https://github.com/EldanGS/Applied-AI-Solution-Architect
 #ClaudeAI #OpenAI #AIAgents #MCP #AIArchitecture #BuildInPublic
 ```
 

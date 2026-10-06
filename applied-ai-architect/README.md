@@ -344,7 +344,7 @@ What I'm learning next:
 2. Evals as the definition of "done"
 3. Safety, governance and POC-to-production, built in Claude AND OpenAI side by side
 
-Track plan + capstones: https://github.com/<your-handle>/AI-solution-architect/tree/main/applied-ai-architect
+Track plan + capstones: https://github.com/EldanGS/Applied-AI-Solution-Architect/tree/main/applied-ai-architect
 #AIArchitecture #AppliedAI #ClaudeAI #OpenAI #BuildInPublic
 ```
 

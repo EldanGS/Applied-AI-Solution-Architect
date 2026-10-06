@@ -141,7 +141,7 @@ The full chapter-by-chapter plan lives in each track README: the [Claude roadmap
 ## Repository structure
 
 ```text
-AI-solution-architect/
+Applied-AI-Solution-Architect/
 ├── README.md                              # you are here: mission, journey map, roadmap, tracker
 ├── COVERAGE.md                            # generated certification coverage map (1,935 requirement IDs)
 ├── requirements.txt                       # shared Python deps for all notebooks
@@ -292,8 +292,8 @@ Requirements: Python 3.11+ and git. For the live cells you also need an Anthropi
 
 ```bash
 # 1. Clone
-git clone https://github.com/<your-handle>/AI-solution-architect.git
-cd AI-solution-architect
+git clone https://github.com/EldanGS/Applied-AI-Solution-Architect.git
+cd Applied-AI-Solution-Architect
 
 # 2. Create and activate a virtual environment
 python3 -m venv .venv              # Windows: py -m venv .venv
