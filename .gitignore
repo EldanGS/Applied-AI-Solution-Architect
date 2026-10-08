@@ -218,3 +218,6 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Local publishing notes (YouTube/social copy), not part of the course
+presentations/**/publish-kit.md
