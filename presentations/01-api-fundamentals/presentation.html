@@ -1,0 +1,734 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claude and OpenAI API Fundamentals</title>
+<style>
+  :root {
+    --ivory: #ffffff;
+    --oat: #e8e6dc;
+    --cloud: #f5f4ef;
+    --slate: #141413;
+    --slate-2: #3d3d3a;
+    --gray: #87867f;
+    --clay: #d97757;
+    --clay-deep: #c6613f;
+    --olive: #788c5d;
+    --sky: #6a9bcc;
+    --fig: #c46686;
+    --serif: "Tiempos Headline", "Source Serif 4", "Iowan Old Style", Georgia, "Times New Roman", serif;
+    --sans: "Styrene A", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    --mono: "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; background: #1b1b1a; overflow: hidden; font-family: var(--sans); }
+
+  /* ---------- stage: fixed 1280x720, scaled to fit ---------- */
+  #stage {
+    position: absolute; left: 50%; top: 50%;
+    width: 1280px; height: 720px;
+    transform-origin: center center;
+    background: var(--ivory);
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,.45);
+  }
+  .slide {
+    position: absolute; inset: 0;
+    padding: 64px 80px 56px;
+    display: flex; flex-direction: column;
+    opacity: 0; visibility: hidden;
+    transform: translateY(10px);
+    transition: opacity .35s ease, transform .35s ease, visibility 0s .35s;
+    color: var(--slate);
+    background: var(--ivory);
+  }
+  .slide.active { opacity: 1; visibility: visible; transform: none; transition-delay: 0s; }
+  .slide.dark { background: var(--slate); color: var(--ivory); }
+  .slide.clay { background: var(--clay); color: var(--ivory); }
+
+  /* ---------- type ---------- */
+  .eyebrow {
+    font-size: 15px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--clay-deep); margin-bottom: 18px;
+  }
+  .dark .eyebrow { color: var(--clay); }
+  .clay .eyebrow { color: rgba(250,249,245,.85); }
+  h1, h2 { font-family: var(--serif); font-weight: 500; letter-spacing: -.015em; line-height: 1.08; }
+  h1 { font-size: 84px; }
+  h2 { font-size: 46px; max-width: 1060px; }
+  h2 em, h1 em { font-style: italic; color: var(--clay-deep); }
+  .dark h2 em, .dark h1 em { color: var(--clay); }
+  h3 { font-family: var(--serif); font-weight: 500; font-size: 28px; line-height: 1.2; margin-bottom: 8px; }
+  p, li { font-size: 22px; line-height: 1.45; color: var(--slate-2); }
+  .dark p, .dark li { color: #c9c8c0; }
+  .lede { font-size: 26px; line-height: 1.4; max-width: 880px; margin-top: 22px; }
+  .small { font-size: 17px; line-height: 1.4; }
+  .muted { color: var(--gray); }
+  strong { color: var(--slate); font-weight: 600; }
+  .dark strong { color: var(--ivory); }
+  code, .mono { font-family: var(--mono); font-size: .86em; background: var(--oat); padding: 1px 7px; border-radius: 5px; color: var(--slate); }
+  .dark code { background: #2a2a28; color: var(--ivory); }
+
+  .body { flex: 1; display: flex; flex-direction: column; justify-content: flex-start; margin-top: 34px; min-height: 0; }
+  .cols { display: grid; gap: 28px; }
+  .c2 { grid-template-columns: 1fr 1fr; }
+  .c3 { grid-template-columns: repeat(3, 1fr); }
+  .c4 { grid-template-columns: repeat(4, 1fr); }
+  .c-wide-left { grid-template-columns: 1.15fr 1fr; }
+
+  .card {
+    background: var(--cloud); border: 1px solid var(--oat); border-radius: 18px;
+    padding: 26px 28px;
+  }
+  .card p, .card li { font-size: 19px; }
+  .card h3 { font-size: 25px; }
+  .dark .card { background: #1f1f1d; border-color: #33332f; }
+  .card .num { font-family: var(--serif); font-size: 44px; color: var(--clay-deep); line-height: 1; margin-bottom: 12px; display: block; }
+  .tag {
+    display: inline-block; font-size: 13px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase;
+    padding: 4px 11px; border-radius: 999px; background: var(--oat); color: var(--slate-2); margin-bottom: 12px;
+  }
+  .tag.clay { background: var(--clay); color: #fff; }
+  .tag.olive { background: var(--olive); color: #fff; }
+  .tag.sky { background: var(--sky); color: #fff; }
+  .tag.slate { background: var(--slate); color: var(--ivory); }
+
+  ul.clean { list-style: none; }
+  ul.clean li { padding-left: 24px; position: relative; margin-bottom: 10px; }
+  ul.clean li::before { content: ""; position: absolute; left: 0; top: .6em; width: 9px; height: 9px; border-radius: 50%; background: var(--clay); }
+
+  pre.code {
+    background: var(--slate); color: #ece9df; border-radius: 16px; padding: 24px 28px;
+    font-family: var(--mono); font-size: 18px; line-height: 1.55; overflow: hidden; white-space: pre;
+  }
+  pre.code .k { color: #e8a58b; } pre.code .s { color: #a9c48a; } pre.code .c { color: #8a897f; } pre.code .n { color: #8fb7de; }
+
+  .callout {
+    border-left: 5px solid var(--clay); background: var(--cloud); border-radius: 0 14px 14px 0;
+    padding: 18px 24px; font-size: 21px; line-height: 1.4; color: var(--slate);
+  }
+  .dark .callout { background: #1f1f1d; color: var(--ivory); }
+  .footer-line { margin-top: auto; padding-top: 20px; font-size: 21px; color: var(--slate-2); }
+
+  /* slide chrome */
+  .chrome { position: absolute; left: 80px; right: 80px; bottom: 24px; display: flex; justify-content: space-between; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--gray); pointer-events: none; }
+  .dark .chrome { color: #6b6a64; } .clay .chrome { color: rgba(250,249,245,.7); }
+
+
+  /* ---------- diagram bits ---------- */
+  .flow { display: flex; align-items: stretch; gap: 14px; }
+  .node {
+    flex: 1; background: var(--cloud); border: 1px solid var(--oat); border-radius: 14px;
+    padding: 16px 14px; text-align: center; font-size: 18px; line-height: 1.3; color: var(--slate);
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  .node.hl { background: var(--clay); color: #fff; border-color: var(--clay); }
+  .node.dk { background: var(--slate); color: var(--ivory); border-color: var(--slate); }
+  .node.hl strong, .node.dk strong { color: inherit; }
+  .node small { display: block; font-size: 14px; opacity: .75; margin-top: 4px; }
+  .arrow { align-self: center; font-size: 26px; color: var(--clay-deep); }
+
+  .bars .row { display: flex; align-items: center; gap: 16px; margin-bottom: 14px; }
+  .bars .lbl { width: 90px; font-size: 17px; color: var(--slate-2); }
+  .bars .track { flex: 1; display: flex; height: 44px; border-radius: 10px; overflow: hidden; background: var(--cloud); }
+  .seg { display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; color: #fff; }
+  .seg.sys { background: var(--clay); } .seg.hist { background: var(--olive); } .seg.new { background: var(--slate); }
+  .legend { display: flex; gap: 22px; font-size: 16px; color: var(--slate-2); margin-top: 6px; }
+  .legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 8px; vertical-align: -1px; }
+
+  table.t { width: 100%; border-collapse: collapse; }
+  table.t td { padding: 9px 0; border-bottom: 1px solid var(--oat); font-size: 19px; color: var(--slate-2); vertical-align: top; }
+  table.t td:first-child { width: 210px; padding-right: 20px; font-weight: 600; color: var(--slate); }
+  .dark table.t td { border-color: #33332f; color: #c9c8c0; } .dark table.t td:first-child { color: var(--ivory); }
+
+
+  /* ---------- UI chrome outside stage ---------- */
+  #progress { position: fixed; left: 0; top: 0; height: 4px; background: var(--clay); width: 0; transition: width .3s; z-index: 5; }
+  #notes {
+    position: fixed; left: 0; right: 0; bottom: 0; height: 170px; background: #111110; color: #d8d6cc;
+    border-top: 1px solid #333; padding: 14px 28px; display: none; overflow: auto; z-index: 4;
+    font-size: 17px; line-height: 1.5;
+  }
+  #notes .meta { font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: var(--clay); margin-bottom: 8px; }
+  body.notes-on #notes { display: block; }
+  #help {
+    position: fixed; right: 16px; top: 14px; font-size: 12px; color: #77766f; font-family: var(--sans);
+    letter-spacing: .04em; z-index: 5; pointer-events: none;
+  }
+  .notes-src { display: none; }
+
+  @media print {
+    @page { size: 1280px 720px; margin: 0; }
+    html, body { overflow: visible; height: auto; background: #fff; }
+    #stage { position: static; transform: none !important; width: 1280px; height: auto; box-shadow: none; overflow: visible; }
+    .slide { position: relative; width: 1280px; height: 720px; opacity: 1; visibility: visible; transform: none; page-break-after: always; break-after: page; }
+    #progress, #notes, #help { display: none !important; }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ---------- level ladder ---------- */
+  .layer { display: flex; align-items: center; gap: 28px; border-radius: 18px; padding: 20px 30px; margin-bottom: 14px; }
+  .layer .lab { width: 250px; flex: none; font-family: var(--serif); font-size: 30px; line-height: 1.15; }
+  .layer .lab small { display: block; font-family: var(--sans); font-size: 14px; letter-spacing: .1em; text-transform: uppercase; opacity: .75; margin-bottom: 4px; }
+  .layer .items { font-size: 21px; line-height: 1.5; }
+  .layer .items em { font-style: normal; opacity: .75; display: block; font-size: 17px; }
+  .layer.l3 { background: var(--slate); color: var(--ivory); }
+  .layer.l2 { background: var(--clay); color: #fff; }
+  .layer.l1 { background: var(--cloud); border: 1px solid var(--oat); color: var(--slate); }
+
+  .c5 { grid-template-columns: repeat(5, 1fr); }
+  .stat { font-family: var(--serif); font-size: 64px; line-height: 1; color: var(--clay-deep); }
+  .stat-l { font-size: 17px; line-height: 1.35; color: var(--slate-2); margin-top: 8px; }
+  .step-n { font-family: var(--serif); font-size: 15px; letter-spacing: .1em; text-transform: uppercase; color: var(--clay-deep); margin-bottom: 8px; display: block; }
+  table.t th { text-align: left; font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: var(--gray); font-weight: 600; padding: 0 0 8px; border-bottom: 2px solid var(--oat); }
+  table.t.v td { font-size: 18px; padding: 8px 0; }
+  table.t.v td:first-child { width: 230px; }
+  table.t.v td:nth-child(2) { width: 430px; padding-right: 20px; }
+  .card table.t td { font-size: 17px; padding: 7px 0; }
+  .card table.t td:first-child { width: 110px; padding-right: 12px; }
+  .chrome { align-items: center; }
+  .soc { display: inline-flex; align-items: center; gap: 20px; text-transform: none; letter-spacing: .02em; }
+  .soc a { color: inherit; text-decoration: none; display: inline-flex; align-items: center; gap: 7px; pointer-events: auto; }
+  .soc a { white-space: nowrap; }
+  .soc svg { width: 18px; height: 18px; flex: none; }
+  .chrome .soc { font-size: 14px; }
+  .hero .chrome .soc { visibility: hidden; }
+  .social .soc { font-size: 19px; gap: 26px; }
+  .social .soc svg { width: 26px; height: 26px; }
+  .social .soc a { color: inherit; }
+  .soc .x rect { fill: #000; } .soc .x path { fill: #fff; }
+  .dark .soc .x rect { fill: #fff; } .dark .soc .x path { fill: #000; }
+
+  /* ---------- chapter 1 additions ---------- */
+  pre.code.sm { font-size: 15px; line-height: 1.5; padding: 18px 22px; }
+  .vhead { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .vhead .tag { margin-bottom: 0; }
+  .vhead span.muted { font-size: 15px; }
+  table.t.sr td { font-size: 17px; padding: 8px 0; }
+  table.t.sr td:first-child { width: 330px; padding-right: 16px; }
+  table.t.sr td:nth-child(2) { width: 300px; padding-right: 16px; }
+  table.t.map td { font-size: 17px; padding: 8px 0; }
+  table.t.map td:first-child { width: 200px; }
+  table.t.map td:nth-child(2) { width: 430px; padding-right: 20px; }
+  table.t.lv td { font-size: 17px; padding: 8px 0; }
+  table.t.lv td:first-child { width: 120px; padding-right: 14px; }
+  table.t.lv td:nth-child(2) { padding-right: 16px; }
+  .seg.both { background: var(--olive); }
+  .seg-out { display: flex; align-items: center; padding-left: 12px; font-size: 16px; font-weight: 600; color: var(--slate-2); }
+  .bars .price { width: 120px; font-size: 15px; color: var(--gray); text-align: right; }
+  .steps { display: flex; flex-direction: column; gap: 10px; }
+  .steps .st { display: flex; gap: 14px; align-items: flex-start; background: var(--cloud); border: 1px solid var(--oat); border-radius: 14px; padding: 12px 16px; }
+  .steps .st b { font-family: var(--serif); font-weight: 500; font-size: 26px; line-height: 1; color: var(--clay-deep); width: 22px; flex: none; }
+  .steps .st p { font-size: 17px; line-height: 1.35; }
+  .steps .st.hl { border-color: var(--clay); }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+  .chip { font-family: var(--mono); font-size: 15px; padding: 5px 11px; border-radius: 8px; background: var(--oat); color: var(--slate); }
+  .chip.hl { background: var(--clay); color: #fff; }
+  .chip.dk { background: var(--slate); color: var(--ivory); }
+  .chip.ol { background: var(--olive); color: #fff; }
+  .lbl-row { font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: var(--gray); font-weight: 600; margin-top: 14px; }
+  .lbl-row:first-child { margin-top: 0; }
+  .dark .card .num { color: var(--clay); }
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<div id="help">← → navigate · N notes · F fullscreen</div>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><radialGradient id="ig-grad" cx="30%" cy="107%" r="150%"><stop offset="0" stop-color="#fdf497"/><stop offset=".05" stop-color="#fdf497"/><stop offset=".45" stop-color="#fd5949"/><stop offset=".6" stop-color="#d6249f"/><stop offset=".9" stop-color="#285aeb"/></radialGradient></defs></svg>
+
+<div id="stage">
+
+<!-- 1 · TITLE -->
+<section class="slide dark hero" data-min="0.5">
+  <div class="eyebrow">Chapter 1 · Claude and OpenAI API fundamentals</div>
+  <div style="margin-top:auto">
+    <h1>One HTTP call<br>under <em>everything</em></h1>
+    <p class="lede" style="color:#c9c8c0">The Claude Messages API and the OpenAI Responses API: what you send, what comes back, and the decisions you own at this layer.</p>
+  </div>
+  <div style="margin-top:56px; display:flex; justify-content:space-between; align-items:center; color:#87867f; font-size:17px;">
+    <span style="display:flex; gap:14px; align-items:center; white-space:nowrap"><span style="width:12px;height:12px;border-radius:50%;background:var(--clay);display:inline-block"></span>20 minutes · Claude + OpenAI</span>
+    <span class="social"><span class="soc"><a href="https://www.instagram.com/eldan.nomad/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="6" fill="url(#ig-grad)"/><circle cx="12" cy="12" r="4.3" fill="none" stroke="#fff" stroke-width="2"/><circle cx="17.4" cy="6.6" r="1.3" fill="#fff"/></svg>@eldan.nomad</a><a href="https://www.youtube.com/@eldan_nomad" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="1" y="4.5" width="22" height="15" rx="4.5" fill="#ff0000"/><path d="M10 8.6 16 12l-6 3.4z" fill="#fff"/></svg>@eldan_nomad</a><a class="x" href="https://x.com/eldan_nomad" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="1.5" y="1.5" width="21" height="21" rx="5"/><path transform="translate(6 6) scale(.5)" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>@eldan_nomad</a><a class="li" href="https://linkedin.com/in/eldan-abdrashim" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="1.5" y="1.5" width="21" height="21" rx="4" fill="#0A66C2"/><path fill="#fff" d="M6.94 9.5h2.5v8h-2.5zM8.19 5.75a1.45 1.45 0 1 1 0 2.9 1.45 1.45 0 0 1 0-2.9zM11 9.5h2.4v1.1h.03c.33-.63 1.15-1.3 2.37-1.3 2.53 0 3 1.67 3 3.83v4.37h-2.5v-3.88c0-.92-.02-2.11-1.29-2.11-1.29 0-1.49 1.01-1.49 2.05v3.94H11z"/></svg>eldan-abdrashim</a></span></span>
+  </div>
+  <div class="notes-src">Everything later in this course (tool use, agents, MCP, Claude Code, Codex) sits on one HTTP call. On Claude that is POST /v1/messages, on OpenAI POST /v1/responses. In twenty minutes we take both apart side by side: the request, the response, how to tell why generation stopped, who owns conversation state, and how tokens, models and effort drive cost.</div>
+</section>
+
+<!-- 2 · WHY -->
+<section class="slide" data-min="1">
+  <div class="eyebrow">Why this matters</div>
+  <h2>Most production incidents start at <em>this layer</em></h2>
+  <div class="body">
+    <div class="cols c3" style="gap:20px">
+      <div class="card"><span class="tag">Symptom</span><h3>“The bot forgot”</h3><p class="small">The app didn’t resend history, or chained from the wrong state.</p><p class="small" style="margin-top:12px"><strong>Layer:</strong> conversation state</p></div>
+      <div class="card"><span class="tag">Symptom</span><h3>“The agent never stopped”</h3><p class="small">The loop parsed the model’s prose instead of the stop signal.</p><p class="small" style="margin-top:12px"><strong>Layer:</strong> <code>stop_reason</code> / <code>status</code></p></div>
+      <div class="card" style="border-color:var(--clay)"><span class="tag clay">Symptom</span><h3>“The bill doubled”</h3><p class="small">Growing history, hidden thinking tokens, the wrong model tier.</p><p class="small" style="margin-top:12px"><strong>Layer:</strong> tokens, model, effort</p></div>
+    </div>
+    <div class="callout" style="margin-top:28px">Tools, agents, MCP and coding agents are all built on this one call. <strong>Get the contract right first.</strong></div>
+  </div>
+  <div class="notes-src">Three incidents you will see in real projects, and each one traces back to a wrong assumption at the API layer, not to the model. The bot forgets because the app did not resend history. The agent loops forever because the code checked whether the reply had text instead of reading the stop signal. The bill doubles because history grows every turn and thinking tokens are billed as output. Everything in the next twenty minutes is about avoiding these three.</div>
+</section>
+
+<!-- 3 · ROADMAP -->
+<section class="slide" data-min="0.5">
+  <div class="eyebrow">Roadmap</div>
+  <h2>Five parts, both vendors <em>side by side</em></h2>
+  <div class="body">
+    <div class="cols c5" style="gap:16px">
+      <div class="card" style="padding:22px 20px"><span class="num" style="font-size:38px">1</span><h3 style="font-size:22px">Request &amp; response</h3><p class="small">Fields, roles, typed output</p></div>
+      <div class="card" style="padding:22px 20px"><span class="num" style="font-size:38px">2</span><h3 style="font-size:22px">Why it stopped</h3><p class="small"><code>stop_reason</code> vs <code>status</code></p></div>
+      <div class="card" style="padding:22px 20px"><span class="num" style="font-size:38px">3</span><h3 style="font-size:22px">Conversation state</h3><p class="small">Stateless vs server-side</p></div>
+      <div class="card" style="padding:22px 20px"><span class="num" style="font-size:38px">4</span><h3 style="font-size:22px">Tokens &amp; models</h3><p class="small">Window, cost, effort</p></div>
+      <div class="card" style="padding:22px 20px; border-color:var(--clay)"><span class="num" style="font-size:38px">5</span><h3 style="font-size:22px">Production</h3><p class="small">Variance, streaming, platforms</p></div>
+    </div>
+    <div class="callout" style="margin-top:28px"><span class="tag clay" style="margin:0 8px 0 0; vertical-align:2px">Claude</span> on the left, <span class="tag slate" style="margin:0 8px 0 4px; vertical-align:2px">OpenAI</span> on the right. Same concepts, different names.</div>
+  </div>
+  <div class="notes-src">Five parts. The request and the response, how to know why generation stopped, who owns the conversation, tokens and model choice, and what changes when you run it in production. On every comparison slide Claude is on the left with a clay tag and OpenAI on the right with a dark tag.</div>
+</section>
+
+<!-- 4 · ANATOMY -->
+<section class="slide" data-min="1.5">
+  <div class="eyebrow">Part 1 · The request</div>
+  <h2>One endpoint. Features are <em>parameters</em>.</h2>
+  <div class="body" style="margin-top:28px">
+    <div class="cols c2" style="gap:20px">
+      <div>
+        <div class="vhead"><span class="tag clay">Claude</span><span class="muted">Messages API</span></div>
+        <pre class="code sm">client.messages.create(
+    model=<span class="s">"claude-sonnet-5-5"</span>,
+    max_tokens=<span class="n">16000</span>,      <span class="c"># required</span>
+    system=<span class="s">"You are concise."</span>,
+    messages=[{<span class="s">"role"</span>: <span class="s">"user"</span>,
+               <span class="s">"content"</span>: <span class="s">"What is an API gateway?"</span>}],
+    output_config={<span class="s">"effort"</span>: <span class="s">"low"</span>},
+)</pre>
+      </div>
+      <div>
+        <div class="vhead"><span class="tag slate">OpenAI</span><span class="muted">Responses API</span></div>
+        <pre class="code sm">client.responses.create(
+    model=<span class="s">"gpt-6-luna"</span>,
+    max_output_tokens=<span class="n">2000</span>,  <span class="c"># optional</span>
+    instructions=<span class="s">"You are concise."</span>,
+    input=<span class="s">"What is an API gateway?"</span>,
+    reasoning={<span class="s">"effort"</span>: <span class="s">"low"</span>},
+    store=<span class="k">False</span>,              <span class="c"># default: True</span>
+)</pre>
+      </div>
+    </div>
+    <div class="callout" style="margin-top:24px; font-size:20px">Both output ceilings <strong>include thinking / reasoning tokens</strong>. Set one too low and the model can spend it all thinking, then return no visible text.</div>
+  </div>
+  <div class="notes-src">Same shape on both sides: one endpoint, and tools, structured output and effort are just parameters on it. Three differences to call out. Claude requires max_tokens; OpenAI's max_output_tokens is optional. Claude's operator instructions go in the top-level system field; OpenAI uses instructions or a developer message. And OpenAI stores responses by default for 30 days, so store=False is a deliberate choice for sensitive workloads. On both, the ceiling includes thinking, so keep it generous: around 16K on Claude non-streaming, and OpenAI suggests reserving at least 25K tokens when you start with reasoning models.</div>
+</section>
+
+<!-- 5 · RESPONSE SHAPE -->
+<section class="slide" data-min="1.25">
+  <div class="eyebrow">Part 1 · The response</div>
+  <h2>The reply is a <em>typed list</em>, not a string</h2>
+  <div class="body" style="margin-top:28px">
+    <div class="cols c2" style="gap:20px">
+      <div class="card" style="padding:22px 24px">
+        <div class="vhead"><span class="tag clay">Claude</span><code>response.content</code></div>
+        <div class="chips"><span class="chip">thinking</span><span class="chip hl">text</span><span class="chip dk">tool_use</span></div>
+        <pre class="code sm" style="margin-top:16px">text = <span class="s">""</span>.join(b.text <span class="k">for</span> b <span class="k">in</span> resp.content
+               <span class="k">if</span> b.type == <span class="s">"text"</span>)</pre>
+      </div>
+      <div class="card" style="padding:22px 24px">
+        <div class="vhead"><span class="tag slate">OpenAI</span><code>response.output</code></div>
+        <div class="chips"><span class="chip">reasoning</span><span class="chip hl">message</span><span class="chip dk">function_call</span></div>
+        <pre class="code sm" style="margin-top:16px">text = resp.output_text  <span class="c"># joins output_text</span>
+<span class="c"># tools, refusals: iterate resp.output by type</span></pre>
+      </div>
+    </div>
+    <div class="callout" style="margin-top:24px; font-size:20px"><code>content[0].text</code> and <code>output[0].content[0].text</code> break the moment thinking, reasoning or a tool call comes first. <strong>Filter by type.</strong></div>
+    <div class="footer-line small muted" style="margin-top:22px">HTTP errors are not stop signals: catch typed exceptions. Both SDKs retry 408, 409, 429 and 5xx twice with backoff.</div>
+  </div>
+  <div class="notes-src">The single most common bug in first integrations. On current models thinking is on by default, so Claude's first block is often a thinking block with no text attribute; on OpenAI the first output item is usually a reasoning item. output_text is fine for "just give me the answer" code, but wrong for anything that must react to tool calls, refusals or truncation. Errors are separate: a failed request is an HTTP error and a typed exception such as RateLimitError; a successful one is HTTP 200 with a stop signal. Note: a 429 from a spend or quota limit will not go away by retrying.</div>
+</section>
+
+<!-- 6 · ROLES -->
+<section class="slide" data-min="1.25">
+  <div class="eyebrow">Part 1 · Roles and instructions</div>
+  <h2>Where operator instructions <em>live</em></h2>
+  <div class="body" style="margin-top:28px">
+    <div class="cols c2" style="gap:20px">
+      <div class="card" style="padding:22px 26px">
+        <span class="tag clay">Claude</span>
+        <ul class="clean small">
+          <li><code>system</code> is a top-level field. Resend it on every call.</li>
+          <li><code>messages</code> alternate <code>user</code> / <code>assistant</code>. Tool results ride in a <code>user</code> turn.</li>
+          <li>Mid-conversation <code>system</code> messages: newest models only.</li>
+          <li>Prefill (ending on an assistant turn) returns <strong>400</strong> on 4.6+ models.</li>
+        </ul>
+      </div>
+      <div class="card" style="padding:22px 26px">
+        <span class="tag slate">OpenAI</span>
+        <ul class="clean small">
+          <li><code>input</code> is a list of items: messages, reasoning, function calls.</li>
+          <li><code>developer</code> / <code>system</code> roles outrank <code>user</code>.</li>
+          <li><code>instructions</code> apply to <strong>this request only</strong>.</li>
+          <li>Not carried by <code>previous_response_id</code>. Resend every turn.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="callout" style="margin-top:24px; font-size:20px"><strong>Scope every rule.</strong> “Always verify the customer” makes an agent call the lookup tool on every turn, opening-hours questions included.</div>
+  </div>
+  <div class="notes-src">Both vendors separate operator authority from user input, but the mechanics differ. Claude: the system field is persistent only because your code resends it. Mid-conversation system messages exist on Opus 5.5, Sonnet 5.5 and Fable models but are rejected by Haiku 4.5 and older; never put untrusted text there. Prefill is gone on current models: use structured outputs. OpenAI: classic trap, the team switches to previous_response_id and the tone rules stop working from turn 2, because instructions are not carried over. Last point applies to both: absolute, keyword-style rules create unintended tool associations. If a tool is over-used despite a clear description, check the system prompt wording first.</div>
+</section>
+
+<!-- 7 · CLAUDE STOP_REASON -->
+<section class="slide" data-min="1.5">
+  <div class="eyebrow">Part 2 · Why it stopped · Claude</div>
+  <h2>Claude: one field, <em>seven</em> answers</h2>
+  <div class="body" style="margin-top:24px">
+    <table class="t sr">
+      <tr><th>Value</th><th>Meaning</th><th>Your code</th></tr>
+      <tr><td><code>end_turn</code></td><td>Finished naturally</td><td>Return the answer</td></tr>
+      <tr><td><code>tool_use</code></td><td>Wants your tools</td><td>Run every call, send all results in one <code>user</code> turn, call again</td></tr>
+      <tr><td><code>max_tokens</code></td><td>Output budget hit, truncated</td><td>Raise the limit or stream. Never run a half-written tool call</td></tr>
+      <tr><td><code>model_context_window_exceeded</code></td><td>Whole window is full</td><td>Shrink the input. A bigger <code>max_tokens</code> does nothing</td></tr>
+      <tr><td><code>pause_turn</code></td><td>Server tool loop paused</td><td>Send the assistant turn back unchanged</td></tr>
+      <tr><td><code>stop_sequence</code></td><td>Your custom stop string</td><td>App logic; read <code>resp.stop_sequence</code></td></tr>
+      <tr><td><code>refusal</code></td><td>Model or classifier declined</td><td>Check before reading content; explain or fall back</td></tr>
+    </table>
+    <div class="callout" style="margin-top:24px; font-size:20px">Agent loop: <strong>continue while <code>tool_use</code>, stop on <code>end_turn</code>.</strong> Never search the prose for “done”.</div>
+  </div>
+  <div class="notes-src">stop_reason is the only reliable control signal. The guide lists four values; the current API has seven. The pair to remember: max_tokens and model_context_window_exceeded both mean truncated output, but the fixes are opposite. The first means too few output tokens; the second means the whole context is full, so you remove input. Refusal arrives with HTTP 200 and possibly empty content, so check it before reading content; stop_details explains the category. A fixed iteration cap is a good safety net, never the primary stopping rule.</div>
+</section>
+
+<!-- 8 · OPENAI STATUS -->
+<section class="slide" data-min="1.25">
+  <div class="eyebrow">Part 2 · Why it stopped · OpenAI</div>
+  <h2>OpenAI: <em>three places</em> to look</h2>
+  <div class="body" style="margin-top:28px">
+    <div class="cols c3" style="gap:18px">
+      <div class="card" style="padding:20px 22px"><span class="num" style="font-size:34px">1</span><h3 style="font-size:22px"><code>status</code></h3><p class="small">completed · incomplete · failed · cancelled · queued / in_progress</p></div>
+      <div class="card" style="padding:20px 22px"><span class="num" style="font-size:34px">2</span><h3 style="font-size:22px"><code>incomplete_details</code></h3><p class="small"><code>.reason</code>: <code>max_output_tokens</code> or <code>content_filter</code></p></div>
+      <div class="card" style="padding:20px 22px"><span class="num" style="font-size:34px">3</span><h3 style="font-size:22px">Output item types</h3><p class="small"><code>function_call</code> → run tools · refusal part → fall back · text → answer</p></div>
+    </div>
+    <div class="callout" style="margin-top:22px; font-size:20px"><strong>HTTP 200, empty answer?</strong> <code>incomplete</code> + <code>max_output_tokens</code> + no text = the budget went to reasoning. You paid and got nothing. Raise the budget or lower effort; don’t rewrite the prompt.</div>
+    <div class="footer-line" style="margin-top:22px">Agent loop: <strong>continue while the response has <code>function_call</code> items.</strong> Text can arrive alongside a tool call.</div>
+  </div>
+  <div class="notes-src">OpenAI has no single stop_reason. A tool request is a completed response that contains function_call items, a refusal is a content part inside a message, and truncation is status incomplete with a reason. The empty-answer trap is the classic exam and production question: the request succeeded, output_text is empty, and the cause is a max_output_tokens budget consumed by reasoning. For loops, checking whether output_text is non-empty is wrong, because the model can write a preamble and call a tool in the same response.</div>
+</section>
+
+<!-- 9 · CLAUDE STATE -->
+<section class="slide" data-min="1">
+  <div class="eyebrow">Part 3 · Conversation state · Claude</div>
+  <h2>Claude is <em>stateless</em>. Your app owns the history.</h2>
+  <div class="body">
+    <div class="cols c-wide-left" style="align-items:start; gap:36px">
+      <div class="bars">
+        <div class="row"><span class="lbl">Turn 1</span><div class="track"><div class="seg sys" style="width:18%">system</div><div class="seg new" style="width:10%">new</div></div></div>
+        <div class="row"><span class="lbl">Turn 2</span><div class="track"><div class="seg sys" style="width:18%">system</div><div class="seg hist" style="width:22%">history</div><div class="seg new" style="width:10%">new</div></div></div>
+        <div class="row"><span class="lbl">Turn 3</span><div class="track"><div class="seg sys" style="width:18%">system</div><div class="seg hist" style="width:46%">history</div><div class="seg new" style="width:10%">new</div></div></div>
+        <div class="row"><span class="lbl">Turn 4</span><div class="track"><div class="seg sys" style="width:18%">system</div><div class="seg hist" style="width:68%">history</div><div class="seg new" style="width:10%">new</div></div></div>
+        <div class="legend"><span><i style="background:var(--clay)"></i>system + tools</span><span><i style="background:var(--olive)"></i>resent history</span><span><i style="background:var(--slate)"></i>this turn</span></div>
+        <p class="small muted" style="margin-top:14px">Input tokens, cost and latency grow every turn.</p>
+      </div>
+      <pre class="code sm">history.append({<span class="s">"role"</span>: <span class="s">"user"</span>,
+                <span class="s">"content"</span>: text})
+resp = client.messages.create(
+    model=MODEL, max_tokens=<span class="n">16000</span>,
+    system=SYSTEM, messages=history)
+<span class="c"># keep full blocks, not just text</span>
+history.append({<span class="s">"role"</span>: <span class="s">"assistant"</span>,
+                <span class="s">"content"</span>: resp.content})</pre>
+    </div>
+    <div class="callout" style="margin-top:26px; font-size:20px">“It forgot what I said two turns ago” = the app didn’t resend history. Not a window problem. <strong>There is no <code>session_id</code>.</strong></div>
+  </div>
+  <div class="notes-src">The Messages API keeps nothing between calls: no session, no server-side history. Every turn you resend the system prompt, tools and the whole conversation. Append resp.content, not just the text, so thinking and tool_use blocks survive. Two turns of chat cannot overflow a 1M window, so a forgetful bot is almost always a missing-history bug. To keep long chats affordable: prompt caching for the stable prefix, and a hybrid history of structured facts, a summary of old turns and recent turns verbatim.</div>
+</section>
+
+<!-- 10 · OPENAI STATE -->
+<section class="slide" data-min="1.5">
+  <div class="eyebrow">Part 3 · Conversation state · OpenAI</div>
+  <h2>OpenAI: decide <em>who owns</em> the state</h2>
+  <div class="body" style="margin-top:28px">
+    <div class="cols c3" style="gap:18px">
+      <div class="card" style="padding:20px 24px"><span class="tag olive">Your app</span><h3 style="font-size:24px">Stateless</h3><p class="small"><code>store=False</code>, replay every output item yourself.</p><p class="small" style="margin-top:10px"><strong>Stored:</strong> nothing<br><strong>Fits:</strong> ZDR, compliance, portability</p></div>
+      <div class="card" style="padding:20px 24px"><span class="tag sky">OpenAI · 30 days</span><h3 style="font-size:24px">Chained</h3><p class="small">Send <code>previous_response_id</code> + the new input.</p><p class="small" style="margin-top:10px"><strong>Stored:</strong> each response<br><strong>Fits:</strong> short sessions, least code</p></div>
+      <div class="card" style="padding:20px 24px; border-color:var(--clay)"><span class="tag clay">OpenAI · until deleted</span><h3 style="font-size:24px">Durable</h3><p class="small">Conversations API, <code>conversation=conv.id</code>.</p><p class="small" style="margin-top:10px"><strong>Stored:</strong> conversation + items<br><strong>Fits:</strong> threads across devices, jobs</p></div>
+    </div>
+    <div class="callout" style="margin-top:22px; font-size:20px">Server-side state is <strong>not cheaper</strong>: the whole chain is billed as input every turn. It is a <strong>data-retention decision</strong>, and <code>store</code> defaults to <code>true</code>.</div>
+  </div>
+  <div class="notes-src">This is the biggest architectural difference from Claude. Rules worth memorizing: previous_response_id and conversation cannot be combined. Over HTTP, chaining needs a stored response, so store=False plus previous_response_id is unsupported; replay history instead. Deleting a conversation does not delete its items; delete the items first. With Zero Data Retention, store is always false and the Conversations API is not eligible, so a ZDR design is stateless with compaction. And switching to previous_response_id is not just a refactor: it moves conversation data into OpenAI storage for 30 days. Check with whoever owns retention.</div>
+</section>
+
+<!-- 11 · CONTEXT WINDOW -->
+<section class="slide" data-min="1.25">
+  <div class="eyebrow">Part 4 · Context window</div>
+  <h2>Bigger window, same rule: <em>curate</em></h2>
+  <div class="body">
+    <div class="cols c-wide-left" style="align-items:start; gap:32px">
+      <div>
+        <div class="bars"><div class="row"><div class="track" style="height:48px"><div class="seg sys" style="width:16%">system</div><div class="seg sys" style="width:14%; background:var(--clay-deep)">tools</div><div class="seg hist" style="width:40%">history + tool results</div><div class="seg new" style="width:30%">output + thinking</div></div></div></div>
+        <table class="t" style="margin-top:12px">
+          <tr><th>Model</th><th>Window</th><th>Output</th></tr>
+          <tr><td style="width:320px">Fable 5.1 · Opus 5.5 · Sonnet 5.5</td><td>1M</td><td>128K</td></tr>
+          <tr><td>Haiku 4.5</td><td>200K</td><td>64K</td></tr>
+          <tr><td>GPT-6 Astra · 6.1 Sol · Luna</td><td>1.05M <span class="small muted">(922K in)</span></td><td>128K</td></tr>
+        </table>
+      </div>
+      <div class="steps">
+        <div class="st"><b>1</b><p><strong>Lost in the middle.</strong> Key facts at the edges: documents first, question last.</p></div>
+        <div class="st"><b>2</b><p><strong>Tool-result bloat.</strong> A tool returns 40 fields, you need 5. Trim before you append.</p></div>
+        <div class="st hl"><b>3</b><p><strong>Lossy summaries.</strong> Amounts, dates and IDs go vague. Keep a never-summarized “case facts” block.</p></div>
+      </div>
+    </div>
+    <div class="callout" style="margin-top:26px; font-size:20px">“Switch to a bigger window” is usually the <strong>wrong fix</strong>. Accuracy degrades as context grows.</div>
+  </div>
+  <div class="notes-src">Everything counts toward the window: system prompt, tool definitions, every message and tool result, and this turn's output including thinking. On current Claude models, earlier thinking blocks are kept and count as input. Both vendors now offer around a million tokens, which tempts people to dump everything in. Anthropic calls the degradation context rot. The three failure patterns apply to both vendors unchanged. Overflow behaviour: Claude returns 400 if the input alone is too long, and model_context_window_exceeded if generation fills it. OpenAI returns 400 by default; truncation auto silently drops the oldest items, which often hold the critical facts.</div>
+</section>
+
+<!-- 12 · TOKENS -->
+<section class="slide" data-min="1">
+  <div class="eyebrow">Part 4 · Tokens</div>
+  <h2>Count <em>before</em>, measure <em>after</em></h2>
+  <div class="body" style="margin-top:26px">
+    <div class="cols c2" style="gap:20px">
+      <div>
+        <div class="vhead"><span class="tag clay">Claude</span><span class="muted">counting is free</span></div>
+        <pre class="code sm"><span class="c"># before</span>
+client.messages.count_tokens(
+    model=MODEL, system=SYSTEM, messages=msgs)
+<span class="c"># after</span>
+resp.usage.input_tokens, resp.usage.output_tokens
+resp.usage.cache_read_input_tokens</pre>
+      </div>
+      <div>
+        <div class="vhead"><span class="tag slate">OpenAI</span><span class="muted">counts formatting tokens too</span></div>
+        <pre class="code sm"><span class="c"># before</span>
+client.responses.input_tokens.count(
+    model=MODEL, instructions=RULES, input=items)
+<span class="c"># after</span>
+resp.usage.output_tokens_details.reasoning_tokens
+resp.usage.input_tokens_details.cached_tokens</pre>
+      </div>
+    </div>
+    <div class="cols c3" style="margin-top:20px; gap:18px">
+      <div class="card" style="padding:16px 20px"><p class="small"><strong>Thinking is billed as output</strong> on both, and counts against the output ceiling.</p></div>
+      <div class="card" style="padding:16px 20px"><p class="small"><strong>Tokenizers differ.</strong> Claude 4.7+ models produce ~30% more tokens. No <code>tiktoken</code>, no chars ÷ 4.</p></div>
+      <div class="card" style="padding:16px 20px"><p class="small"><strong>GPT-6 over 272K input:</strong> 2× input, 1.5× output, for the whole request.</p></div>
+    </div>
+  </div>
+  <div class="notes-src">Use the provider's counting endpoint with the model you will actually call; counts are model-specific. Claude's count_tokens is free with its own rate limit; it rejects server tools and URL-sourced files, so read usage after the call for those. OpenAI's input_tokens.count accepts the same input as create, but not generation options like max_output_tokens or store. A 1M window is available on GPT-6, but filling it past 272K is a pricing decision. Caching: Claude cache reads cost 10% of input on most models; OpenAI caching is automatic from 1,024 tokens and up to 95% cheaper. Neither lowers the size of the context.</div>
+</section>
+
+<!-- 13 · COST -->
+<section class="slide" data-min="1">
+  <div class="eyebrow">Part 4 · Cost</div>
+  <h2>Same workload, a <em>100×</em> price spread</h2>
+  <div class="body" style="margin-top:22px">
+    <p class="small muted" style="margin-bottom:18px">1,000 requests × (2,000 input + 500 output tokens) · list price per million tokens · checked 2026-10-03</p>
+    <div class="bars">
+      <div class="row"><span class="lbl" style="width:250px">Fable 5.1 · GPT-6 Astra</span><span class="price">$10 / $50</span><div class="track"><div class="seg both" style="width:100%;font-size:17px">$45.00</div></div></div>
+      <div class="row"><span class="lbl" style="width:250px">Opus 5.5</span><span class="price">$4 / $20</span><div class="track"><div class="seg sys" style="width:40%;font-size:17px">$18.00</div></div></div>
+      <div class="row"><span class="lbl" style="width:250px">Sonnet 5.5 · GPT-6.1 Sol</span><span class="price">$2 / $10</span><div class="track"><div class="seg both" style="width:20%;font-size:17px">$9.00</div></div></div>
+      <div class="row"><span class="lbl" style="width:250px">Haiku 4.5</span><span class="price">$1 / $5</span><div class="track"><div class="seg sys" style="width:10%;font-size:17px">$4.50</div></div></div>
+      <div class="row"><span class="lbl" style="width:250px">GPT-6 Luna</span><span class="price">$0.10 / $0.50</span><div class="track"><div class="seg new" style="width:1.2%"></div><span class="seg-out">$0.45</span></div></div>
+      <div class="legend" style="margin-left:402px"><span><i style="background:var(--clay)"></i>Claude</span><span><i style="background:var(--slate)"></i>OpenAI</span><span><i style="background:var(--olive)"></i>same price on both</span></div>
+    </div>
+    <div class="callout" style="margin-top:22px; font-size:20px">Excludes thinking tokens and tokenizer differences. Decide on <strong>cost per successful task</strong> at your quality bar, not list price.</div>
+  </div>
+  <div class="notes-src">Do the arithmetic once out loud: Sonnet 5.5 is 2M input tokens times $2 plus 0.5M output times $10, so $4 plus $5 equals $9. Output is half the bill from a fifth of the tokens. The cheapest list price is not automatically the cheapest system: a model that needs retries or extra turns costs more per completed task. Batch processing halves all of these on both vendors. Re-check pricing pages before any real estimate. Also note Haiku 4.5's retirement commitment is only "not sooner than October 15, 2026"; check the deprecations page before building on it.</div>
+</section>
+
+<!-- 14 · MODEL + EFFORT -->
+<section class="slide" data-min="1.5">
+  <div class="eyebrow">Part 4 · Model and effort</div>
+  <h2>Pick the <em>cheapest config</em> that passes your eval</h2>
+  <div class="body" style="margin-top:26px">
+    <div class="cols c-wide-left" style="align-items:start; gap:32px">
+      <table class="t lv">
+        <tr><th>Lever</th><th>Claude</th><th>OpenAI</th></tr>
+        <tr><td>Tier</td><td>Fable 5.1 · Opus 5.5 · Sonnet 5.5 · Haiku 4.5</td><td>Astra · 6.1 Sol · Luna</td></tr>
+        <tr><td>Effort</td><td><code>output_config.effort</code><br>low → max</td><td><code>reasoning.effort</code><br>none → max, subset per model</td></tr>
+        <tr><td>Default</td><td>Sonnet, Fable: high<br>Opus: medium</td><td>Sol, Luna: medium<br>Astra: set it explicitly</td></tr>
+        <tr><td>Length</td><td>Prompt + <code>max_tokens</code></td><td><code>text.verbosity</code></td></tr>
+      </table>
+      <div class="steps">
+        <div class="st"><b>1</b><p><strong>Eval set:</strong> 20–100 real examples and a pass criterion.</p></div>
+        <div class="st"><b>2</b><p><strong>Start capable</strong> to set the quality bar.</p></div>
+        <div class="st hl"><b>3</b><p><strong>Step down</strong>: lower effort, then a cheaper model, while the eval passes.</p></div>
+        <div class="st"><b>4</b><p><strong>Compare cost per completed task</strong>, retries included.</p></div>
+      </div>
+    </div>
+    <div class="callout" style="margin-top:26px; font-size:20px">A stronger model at lower effort can beat a weaker one at high effort. <strong>Measure both.</strong></div>
+  </div>
+  <div class="notes-src">Three levers interact: model tier, effort, and architecture, such as a cheap model for routing and a strong one for synthesis. On OpenAI each model accepts only a subset of effort values, and an unsupported one returns 400: Astra has no none, 6.1 Sol starts at low, Luna supports none for latency-critical work. Haiku 4.5 does not support effort at all. OpenAI's fast-front pattern: a cheap model chats with the user and delegates heavy tasks to Astra, so you pay flagship prices only where it pays off. Wrong answers on the exam: "use the biggest model to be safe" and "pick the largest context window".</div>
+</section>
+
+<!-- 15 · NON-DETERMINISM -->
+<section class="slide" data-min="1">
+  <div class="eyebrow">Part 5 · Non-determinism</div>
+  <h2>Same request, different answer. <em>Design for it.</em></h2>
+  <div class="body">
+    <div class="cols c2" style="align-items:start; gap:28px">
+      <div class="card" style="border-color:var(--clay)">
+        <span class="tag clay">Wrong twice</span>
+        <h3><code>temperature=0</code> for stable tests</h3>
+        <p class="small" style="margin-top:8px"><strong>Claude:</strong> non-default <code>temperature</code>, <code>top_p</code>, <code>top_k</code> return 400 on models after Opus 4.6.</p>
+        <p class="small" style="margin-top:8px"><strong>OpenAI:</strong> remove <code>temperature</code> and <code>top_p</code> on GPT-6 unless effort is <code>none</code>.</p>
+        <p class="small" style="margin-top:8px">And it never guaranteed identical output anyway.</p>
+      </div>
+      <ul class="clean">
+        <li><strong>Test properties:</strong> parses, matches schema, right label, has the facts.</li>
+        <li><strong>3–5 runs per example.</strong> Report a pass rate, not one demo.</li>
+        <li><strong>Structured outputs</strong> fix the shape. Validators check the content.</li>
+        <li><strong>Pin and log</strong> model ID, prompt version, effort, tools, request ID.</li>
+        <li><strong>Same answer every time?</strong> Store it in your app.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="notes-src">Each token is sampled, and with adaptive thinking the model also chooses how much to reason, so identical requests can produce different text, different tool calls or occasionally a different label. Prompt caching does not change this; it reuses the processed prefix, not the answer. On OpenAI the Playground is the place to explore, but a prompt that looked right on three inputs is not evidence: move it into a versioned prompt builder in your repo with an eval set. Saved prompt objects (v1/prompts) shut down on 2026-11-30.</div>
+</section>
+
+<!-- 16 · PRODUCTION ACCESS -->
+<section class="slide" data-min="1.5">
+  <div class="eyebrow">Part 5 · Production access</div>
+  <h2>Getting the call into <em>production</em></h2>
+  <div class="body" style="margin-top:28px">
+    <div class="cols c2" style="gap:20px">
+      <div class="card" style="padding:22px 26px">
+        <span class="tag clay">Claude</span>
+        <ul class="clean small">
+          <li><strong>SDK over raw REST:</strong> auth, retries, typed errors, request IDs.</li>
+          <li><strong><code>AsyncAnthropic</code></strong> + a semaphore for fan-out under rate limits.</li>
+          <li><strong>Bedrock, Google Cloud, Foundry:</strong> new client class and model-ID map, same body.</li>
+          <li>Batches and Models API: <strong>Claude API only</strong>.</li>
+        </ul>
+      </div>
+      <div class="card" style="padding:22px 26px">
+        <span class="tag slate">OpenAI</span>
+        <ul class="clean small">
+          <li><strong><code>stream=True</code>:</strong> typed events such as <code>response.output_text.delta</code>.</li>
+          <li><strong><code>background=True</code></strong> + polling or webhooks for multi-minute jobs.</li>
+          <li><strong>WebSocket mode:</strong> up to ~40% faster with 20+ tool calls.</li>
+          <li>Chat Completions is legacy. <strong>Assistants API retired</strong> 2026-08-26.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="callout" style="margin-top:24px; font-size:20px"><strong>Never blind-retry a timed-out long job:</strong> each retry starts and bills a new run. Stream long output; use background mode or batches instead.</div>
+  </div>
+  <div class="notes-src">Claude: the SDK is a typed wrapper over one POST with three headers, so raw HTTP is only for languages without an SDK or for debugging. Async does not make one call faster; it keeps more in flight. On cloud platforms the request body stays the same, but the client class, model ID and credentials change: Bedrock adds the anthropic. prefix, Foundry uses your deployment name. Features differ too, so check parity before you design. OpenAI: background mode exists for reasoning that can take minutes behind proxies with short timeouts. Chat Completions is still supported, but GPT-6 Astra and 6.1 Sol need the Responses API for tool calling.</div>
+</section>
+
+<!-- 17 · VENDOR MAP -->
+<section class="slide" data-min="1">
+  <div class="eyebrow">Recap · Claude and OpenAI</div>
+  <h2>Learn the concept once, <em>map the names</em></h2>
+  <div class="body" style="margin-top:24px">
+    <table class="t map">
+      <tr><th>Concept</th><th>Claude · Messages API</th><th>OpenAI · Responses API</th></tr>
+      <tr><td>Output ceiling</td><td><code>max_tokens</code> (required)</td><td><code>max_output_tokens</code> (optional)</td></tr>
+      <tr><td>Operator rules</td><td>Top-level <code>system</code></td><td><code>instructions</code> (per request) or <code>developer</code> item</td></tr>
+      <tr><td>Reply</td><td><code>content</code> blocks</td><td><code>output</code> items + <code>output_text</code></td></tr>
+      <tr><td>Why it stopped</td><td><code>stop_reason</code> (7 values)</td><td><code>status</code> + <code>incomplete_details</code> + item types</td></tr>
+      <tr><td>State</td><td>Stateless only</td><td>Stateless · chained · Conversations</td></tr>
+      <tr><td>Effort</td><td><code>output_config.effort</code></td><td><code>reasoning.effort</code> + <code>text.verbosity</code></td></tr>
+      <tr><td>Count tokens</td><td><code>messages.count_tokens</code></td><td><code>responses.input_tokens.count</code></td></tr>
+      <tr><td>Long jobs</td><td>Streaming, Message Batches</td><td>Streaming, background mode, Batch API</td></tr>
+    </table>
+  </div>
+  <div class="notes-src">Pause here for questions. This table is the whole chapter in one view. When you talk to a customer, talk in the concept column; the vendor choice comes after the design. If you learned Claude first, the OpenAI chapter is mostly "same as Claude, except" these rows.</div>
+</section>
+
+<!-- 18 · CLOSE -->
+<section class="slide dark hero" data-min="0.5">
+  <div class="eyebrow">Takeaways</div>
+  <h2>Five rules for <em>this layer</em></h2>
+  <div class="body">
+    <div class="cols c5" style="gap:16px">
+      <div class="card" style="padding:22px 20px"><span class="num" style="font-size:36px">1</span><p class="small">Filter output <strong>by type</strong>, never by position.</p></div>
+      <div class="card" style="padding:22px 20px"><span class="num" style="font-size:36px">2</span><p class="small">Branch on the <strong>stop signal</strong>, never on prose.</p></div>
+      <div class="card" style="padding:22px 20px"><span class="num" style="font-size:36px">3</span><p class="small">Know <strong>who owns state</strong> and what it stores.</p></div>
+      <div class="card" style="padding:22px 20px"><span class="num" style="font-size:36px">4</span><p class="small">Count tokens. <strong>Budget for thinking.</strong></p></div>
+      <div class="card" style="padding:22px 20px"><span class="num" style="font-size:36px">5</span><p class="small">Choose model and effort <strong>with an eval</strong>.</p></div>
+    </div>
+    <div class="callout" style="margin-top:28px"><strong>Next:</strong> tool use and function calling, the loop that starts when the model asks for a tool. Practice with <code>01_practice.ipynb</code>; test yourself with <code>02_homework.ipynb</code>.</div>
+    <div class="social" style="margin-top:26px; display:flex; align-items:center; gap:26px; color:#c9c8c0"><span style="font-size:15px; letter-spacing:.14em; text-transform:uppercase; color:var(--clay); font-weight:600">Follow the journey</span><span class="soc"><a href="https://www.instagram.com/eldan.nomad/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="6" fill="url(#ig-grad)"/><circle cx="12" cy="12" r="4.3" fill="none" stroke="#fff" stroke-width="2"/><circle cx="17.4" cy="6.6" r="1.3" fill="#fff"/></svg>@eldan.nomad</a><a href="https://www.youtube.com/@eldan_nomad" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="1" y="4.5" width="22" height="15" rx="4.5" fill="#ff0000"/><path d="M10 8.6 16 12l-6 3.4z" fill="#fff"/></svg>@eldan_nomad</a><a class="x" href="https://x.com/eldan_nomad" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="1.5" y="1.5" width="21" height="21" rx="5"/><path transform="translate(6 6) scale(.5)" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>@eldan_nomad</a><a class="li" href="https://linkedin.com/in/eldan-abdrashim" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="1.5" y="1.5" width="21" height="21" rx="4" fill="#0A66C2"/><path fill="#fff" d="M6.94 9.5h2.5v8h-2.5zM8.19 5.75a1.45 1.45 0 1 1 0 2.9 1.45 1.45 0 0 1 0-2.9zM11 9.5h2.4v1.1h.03c.33-.63 1.15-1.3 2.37-1.3 2.53 0 3 1.67 3 3.83v4.37h-2.5v-3.88c0-.92-.02-2.11-1.29-2.11-1.29 0-1.49 1.01-1.49 2.05v3.94H11z"/></svg>eldan-abdrashim</a></span></div>
+  </div>
+  <div class="notes-src">Five rules that prevent most incidents at this layer. Each chapter folder has a practice notebook with a ChatSession mini-project that handles every stop signal and reports cost, and a homework notebook with a scenario quiz. Chapter 2 builds the tool loop on top of everything we covered: Claude's tool_use and tool_result, OpenAI's function_call and function_call_output.</div>
+</section>
+
+</div><!-- /stage -->
+
+
+<div id="notes"><div class="meta"></div><div class="text"></div></div>
+<script>
+(function () {
+  var stage = document.getElementById('stage');
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var bar = document.getElementById('progress');
+  var notes = document.getElementById('notes');
+  var NOTES_H = 170;
+  var total = slides.reduce(function (a, s) { return a + parseFloat(s.dataset.min || 1); }, 0);
+  var cur = 0;
+  var SOC = document.querySelector('.social .soc').outerHTML;
+
+  slides.forEach(function (s, i) {
+    var chrome = document.createElement('div');
+    chrome.className = 'chrome';
+    chrome.innerHTML = SOC + '<span>API Fundamentals · ' + (i + 1) + ' / ' + slides.length + '</span>';
+    s.appendChild(chrome);
+  });
+
+  function fit() {
+    var availH = window.innerHeight - (document.body.classList.contains('notes-on') ? NOTES_H : 0);
+    var s = Math.min(window.innerWidth / 1280, availH / 720);
+    stage.style.transform = 'translate(-50%, -50%) scale(' + s + ')';
+    stage.style.top = (availH / 2) + 'px';
+  }
+
+  function render() {
+    slides.forEach(function (s, i) { s.classList.toggle('active', i === cur); });
+    bar.style.width = ((cur + 1) / slides.length * 100) + '%';
+    var elapsed = 0;
+    for (var i = 0; i < cur; i++) elapsed += parseFloat(slides[i].dataset.min || 1);
+    var src = slides[cur].querySelector('.notes-src');
+    notes.querySelector('.meta').textContent =
+      'Slide ' + (cur + 1) + '/' + slides.length + ' · ~' + slides[cur].dataset.min + ' min here · target elapsed ' + elapsed.toFixed(1) + ' of ' + total.toFixed(1) + ' min';
+    notes.querySelector('.text').textContent = src ? src.textContent : '';
+    try { history.replaceState(null, '', '#' + (cur + 1)); } catch (e) {}
+  }
+
+  function go(n) { cur = Math.max(0, Math.min(slides.length - 1, n)); render(); }
+
+  document.addEventListener('keydown', function (e) {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    switch (e.key) {
+      case 'ArrowRight': case 'ArrowDown': case 'PageDown': case ' ': case 'Enter': e.preventDefault(); go(cur + 1); break;
+      case 'ArrowLeft': case 'ArrowUp': case 'PageUp': case 'Backspace': e.preventDefault(); go(cur - 1); break;
+      case 'Home': go(0); break;
+      case 'End': go(slides.length - 1); break;
+      case 'n': case 'N': document.body.classList.toggle('notes-on'); fit(); break;
+      case 'f': case 'F':
+        if (!document.fullscreenElement) document.documentElement.requestFullscreen && document.documentElement.requestFullscreen();
+        else document.exitFullscreen();
+        break;
+    }
+  });
+
+  stage.addEventListener('click', function (e) {
+    if (e.target.closest('a')) return;
+    var r = stage.getBoundingClientRect();
+    go(e.clientX - r.left < r.width * 0.25 ? cur - 1 : cur + 1);
+  });
+
+  var tx = null;
+  document.addEventListener('touchstart', function (e) { tx = e.touches[0].clientX; }, { passive: true });
+  document.addEventListener('touchend', function (e) {
+    if (tx === null) return;
+    var dx = e.changedTouches[0].clientX - tx;
+    if (Math.abs(dx) > 40) go(cur + (dx < 0 ? 1 : -1));
+    tx = null;
+  });
+
+  window.addEventListener('resize', fit);
+  var h = parseInt((location.hash || '').slice(1), 10);
+  if (h >= 1 && h <= slides.length) cur = h - 1;
+  fit(); render();
+})();
+</script>
+</body>
+</html>
