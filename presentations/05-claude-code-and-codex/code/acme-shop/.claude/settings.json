@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -m pytest *)",
+      "Edit(./*.py)"
+    ],
+    "deny": [
+      "Edit(./tests/**)",
+      "Read(./.env*)",
+      "Bash(git push *)"
+    ]
+  }
+}

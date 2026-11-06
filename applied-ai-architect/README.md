@@ -143,16 +143,16 @@ What the data says:
 
 ## Chapter plan
 
-These folders are planned and are listed without links until they exist. Each will hold the same three files as every chapter in the repo (see [How the chapters are built](#how-the-chapters-are-built)). Area codes refer to the [competency matrix](#role-competency-matrix-where-the-repo-covers-each-area).
+Chapters 01–06 are written (linked below); the rest are planned and listed without links until they exist. Each holds the same three files as every chapter in the repo (see [How the chapters are built](#how-the-chapters-are-built)). Area codes refer to the [competency matrix](#role-competency-matrix-where-the-repo-covers-each-area).
 
-| # | Chapter folder (planned) | Title | Scope in one line | Certs and courses served | Role areas | Status |
+| # | Chapter folder | Title | Scope in one line | Certs and courses served | Role areas | Status |
 |---|---|---|---|---|---|---|
-| 01 | `01-ai-fluency-prompting-and-output-validation` | AI fluency, prompting and output validation | The 4D AI Fluency framework (Delegation, Description, Discernment, Diligence), prompts for business tasks, and checking outputs for errors, gaps, hallucinations and bias, in Claude and ChatGPT | CCAO-F D1, D2, D7; Anthropic AI Fluency courses; OpenAI AI Foundations | Groundwork for PROMPT and SAFE | ⏳ |
-| 02 | `02-workflow-design-and-delegation` | Workflow design and delegation | Break recurring work into steps, decide what AI does, what a human keeps and what is shared, add review checkpoints, and move from asking AI to assigning work to agents | CCAO-F D4, D7; OpenAI Applied AI Foundations, Agents and Workflows | CHANGE | ⏳ |
-| 03 | `03-discovery-and-use-case-scoping` | Discovery, use-case scoping and value case | Structured discovery with stakeholders, use-case prioritization, problem statement, value case and ROI, success criteria and an evaluation plan | CCAR-P D1, D6; CCDV-F D2; OpenAI Scope AI Solutions, AI Leadership | DISC, CHANGE | ⏳ |
-| 04 | `04-solution-architecture-patterns` | Solution architecture patterns | Augmented LLM vs workflow vs agent, reference architectures, choosing MCP, API/CLI or agent-to-agent integration, and resilience patterns (retries, fallbacks, circuit breakers, idempotency) | CCAR-P D1, D3; CCDV-F D1; OpenAI Scope AI Solutions | ARCH, AGENT | ⏳ |
-| 05 | `05-model-strategy-and-customization` | Model strategy and customization trade-offs | Eval-driven model selection, provider-agnostic and multi-model designs, prompting vs RAG vs fine-tuning, and a vendor-neutral fine-tuning lifecycle | OpenAI Scope, Build with RAG, Optimize; OpenAI AI app development track | ARCH, TUNE, COMM | ⏳ |
-| 06 | `06-rag-pipelines` | RAG pipelines | Ingestion, chunking, embeddings, BM25 + semantic hybrid search, reranking, contextual retrieval, and managed File Search vs a custom pipeline | CCAR-P D3; OpenAI Build with RAG; Anthropic Academy API, Bedrock and Google Cloud courses (RAG modules) | RAG | ⏳ |
+| 01 | [`01-ai-fluency-prompting-and-output-validation`](01-ai-fluency-prompting-and-output-validation/README.md) | AI fluency, prompting and output validation | The 4D AI Fluency framework (Delegation, Description, Discernment, Diligence), prompts for business tasks, and checking outputs for errors, gaps, hallucinations and bias, in Claude and ChatGPT | CCAO-F D1, D2, D7; Anthropic AI Fluency courses; OpenAI AI Foundations | Groundwork for PROMPT and SAFE | 📝 |
+| 02 | [`02-workflow-design-and-delegation`](02-workflow-design-and-delegation/README.md) | Workflow design and delegation | Break recurring work into steps, decide what AI does, what a human keeps and what is shared, add review checkpoints, and move from asking AI to assigning work to agents | CCAO-F D4, D7; OpenAI Applied AI Foundations, Agents and Workflows | CHANGE | 📝 |
+| 03 | [`03-discovery-and-use-case-scoping`](03-discovery-and-use-case-scoping/README.md) | Discovery, use-case scoping and value case | Structured discovery with stakeholders, use-case prioritization, problem statement, value case and ROI, success criteria and an evaluation plan | CCAR-P D1, D6; CCDV-F D2; OpenAI Scope AI Solutions, AI Leadership | DISC, CHANGE | 📝 |
+| 04 | [`04-solution-architecture-patterns`](04-solution-architecture-patterns/README.md) | Solution architecture patterns | Augmented LLM vs workflow vs agent, reference architectures, choosing MCP, API/CLI or agent-to-agent integration, and resilience patterns (retries, fallbacks, circuit breakers, idempotency) | CCAR-P D1, D3; CCDV-F D1; OpenAI Scope AI Solutions | ARCH, AGENT | 📝 |
+| 05 | [`05-model-strategy-and-customization`](05-model-strategy-and-customization/README.md) | Model strategy and customization trade-offs | Eval-driven model selection, provider-agnostic and multi-model designs, prompting vs RAG vs fine-tuning, and a vendor-neutral fine-tuning lifecycle | OpenAI Scope, Build with RAG, Optimize; OpenAI AI app development track | ARCH, TUNE, COMM | 📝 |
+| 06 | [`06-rag-pipelines`](06-rag-pipelines/README.md) | RAG pipelines | Ingestion, chunking, embeddings, BM25 + semantic hybrid search, reranking, contextual retrieval, and managed File Search vs a custom pipeline | CCAR-P D3; OpenAI Build with RAG; Anthropic Academy API, Bedrock and Google Cloud courses (RAG modules) | RAG | 📝 |
 | 07 | `07-retrieval-strategy-and-knowledge-operations` | Retrieval strategy and knowledge operations | Match retrieval to the data and query shape, measure retrieval and answer quality separately, find the failing stage, and keep indexes fresh and permission-aware | CCAR-P D3; OpenAI Build with RAG | RAG | ⏳ |
 | 08 | `08-evaluation-design` | Evaluation design | Success criteria, representative datasets, code-based vs model-based graders, calibrating an LLM judge against human labels, agent and multi-turn evals, eval-driven development | CCAR-P D4; CCDV-F; OpenAI Evaluate AI Applications; Anthropic Academy eval modules | EVAL | ⏳ |
 | 09 | `09-experimentation-and-release-gates` | Experimentation and release gates | A/B tests without overclaiming, regression gates before prompt or model changes, prompt versioning, segment-level regressions and online evaluation | CCAR-P D4; OpenAI Evaluate, Optimize | EVAL, PROMPT | ⏳ |
@@ -168,6 +168,54 @@ These folders are planned and are listed without links until they exist. Each wi
 | 19 | `19-poc-to-production-delivery-and-handoff` | POC to production: delivery and handoff | POC-to-production checklist, lifecycle phases and SLAs, iterate vs re-architect, architecture docs and handoffs, reusable accelerators | CCAR-P D6; CCDV-F D2; OpenAI Scope, AI Leadership | BUILD, CHANGE, COMM | ⏳ |
 
 Status legend (same as the [root progress tracker](../README.md#progress-tracker)): ✅ done (studied, notebooks run against the live API) · 🚧 in progress · 📝 written: README and both notebooks drafted, not yet run end to end against the live API · ⏳ planned.
+
+### Will cover: topics recorded from the gap review
+
+A gap review in November 2026 found these applied topics thin or missing across the repo. Most come from Partner Academy courses the repo had not used yet: Product Foundations, Deployment Architecture and Delivery Methodology (Claude Architect path), the Claude Partner Badge: Claude Code courses ("Claude Code badge" below), Deploying Claude Enterprise with Confidence, and Driving enterprise adoption of Claude. Only chapters that gain something beyond their scope line are listed.
+
+- **02 · Workflow design**: a delegate-or-keep worksheet per step (risk, reversibility, verification cost)
+- **03 · Discovery**
+  - Use-case scoring: volume, complexity, measurability, developer readiness
+  - Structural vs marginal gain
+  - Baselines before Day 1; an ROI scorecard and CIO narrative
+  - Feeds: Delivery Methodology
+- **08 · Evaluation design**: acceptance tests that define "done" before code; evals as the gate before any model or architecture change
+- **09 · Release gates**: staged rollout percentages and a rehearsed rollback (Feeds: Upgrade a client's build to the Claude 5.5 models)
+- **12 · Compliance**: SOC 2 Type II and HIPAA shared-responsibility table (Anthropic's posture vs client controls) (Feeds: Security and Governance)
+- **13 · Integration and identity**
+  - SSO (SAML 2.0, OIDC), SCIM provisioning, IP allowlisting
+  - LLM gateway: central auth, routing, per-team budgets and chargeback, logging
+  - Corporate proxy and custom CA certificates (Claude Code detail in Claude chapter 19)
+  - Feeds: Security and Governance; Deployment Architecture
+- **14 · Cloud deployment**
+  - Four paths: Claude Enterprise direct, Bedrock, Vertex AI, Microsoft Foundry
+  - A one-page deployment decision doc: cloud commitments, buying route, compliance, who owns seats and budgets
+  - Feature-parity gaps found before contract (builds on [Claude chapter 01 §1.8](../anthropic-claude/01-claude-api-fundamentals/README.md))
+  - Three separate data controls: no-training default, custom retention, Zero Data Retention
+  - Residency and ZDR/HIPAA eligibility question bank for security reviews
+  - Feeds: Product Foundations; Deployment Architecture; Security and Governance
+- **15 · Cost and scaling**: per-request cost and latency budgets
+- **16 · Observability**
+  - Claude Code OpenTelemetry export: metrics and events
+  - Analytics and Compliance APIs, audit logs, per-team cost attribution
+  - CI regression tests tied to traces
+  - Feeds: Claude Code badge: Administration and Measurement
+- **17 · Rollout and adoption**
+  - Seat types, role hierarchy, Day-1 checklist (wrong role, zero spend limit)
+  - Five rollout decisions (structure and identity, access, governance, spend, visibility) and how they cascade
+  - Groups, surfaces and connectors per group; spend caps
+  - Managed settings for governing customizations (Claude Code detail in Claude chapter 19)
+  - Adoption phases (activation, acceleration, expansion), Center of Excellence, train-the-trainer, the productivity J-curve
+  - Champion plan; CLAUDE.md and internal docs as infrastructure the client owns
+  - Feeds: Deploying Claude Enterprise with Confidence; Driving enterprise adoption of Claude; Delivery Methodology
+- **19 · Delivery and handoff**
+  - Pilot design: cohort, scope, duration, Day-30 success criteria
+  - Phased rollout: supervised, assisted, delegated, with entry criteria
+  - The 30-day Claude Code activation: pre-kickoff, weekly CoE rhythm, Day-30 showcase, plugin and doc handoff
+  - Engagement failure modes and their early signals
+  - Feeds: Delivery Methodology
+
+[Capstone 04](capstones/04-coding-agents-for-a-team/README.md) will gain an optional decision log and metrics snapshot, mirroring the Claude Code badge capstone.
 
 ---
 

@@ -1,0 +1,7 @@
+# Loads only in a trusted repo
+model = "gpt-6-luna"
+sandbox_mode = "workspace-write"
+approval_policy = "on-request"
+
+[sandbox_workspace_write]
+network_access = false

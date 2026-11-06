@@ -210,7 +210,7 @@ Applied-AI-Solution-Architect/
 │       ├── api-pathway/                                   #   planned
 │       ├── codex-pathway/                                 #   planned
 │       └── foundations-and-leadership/                    #   planned
-└── applied-ai-architect/                  # Track 3 (built: track README, capstones 01–04)
+└── applied-ai-architect/                  # Track 3 (built: track README, chapters 01–06, capstones 01–04)
     ├── README.md                          # track index: certs served, role competencies, chapter plan
     ├── 01-ai-fluency-prompting-and-output-validation/     # planned
     ├── 02-workflow-design-and-delegation/                 # planned
@@ -414,9 +414,13 @@ Each chapter follows the same three-file convention and builds the same solution
 | C2 | [Capstone 02: multi-agent research with provenance](applied-ai-architect/capstones/02-multi-agent-research-with-provenance/README.md) | CCAR-F scenario 3 and exercise 4 | 📝 |
 | C3 | [Capstone 03: structured extraction pipeline at scale](applied-ai-architect/capstones/03-extraction-pipeline-at-scale/README.md) | CCAR-F scenario 6 and exercise 3; Message Batches vs Batch API | 📝 |
 | C4 | [Capstone 04: coding agents for a team](applied-ai-architect/capstones/04-coding-agents-for-a-team/README.md) | CCAR-F scenarios 2, 4, 5 and exercise 2; Claude Code vs Codex | 📝 |
-| 01–02 | `01-ai-fluency-prompting-and-output-validation`, `02-workflow-design-and-delegation` | Knowledge-work fluency, output validation, delegation (CCAO-F) | ⏳ |
-| 03–05 | `03-discovery-and-use-case-scoping`, `04-solution-architecture-patterns`, `05-model-strategy-and-customization` | Discovery and value case, solution patterns, model strategy (CCAR-P D1, D2) | ⏳ |
-| 06–09 | `06-rag-pipelines`, `07-retrieval-strategy-and-knowledge-operations`, `08-evaluation-design`, `09-experimentation-and-release-gates` | RAG, retrieval quality, evals, release gates (CCAR-P D3, D4) | ⏳ |
+| 01 | [`01-ai-fluency-prompting-and-output-validation`](applied-ai-architect/01-ai-fluency-prompting-and-output-validation/README.md) | Knowledge-work fluency and output validation (CCAO-F) | 📝 |
+| 02 | [`02-workflow-design-and-delegation`](applied-ai-architect/02-workflow-design-and-delegation/README.md) | Workflow design and delegation (CCAO-F) | 📝 |
+| 03 | [`03-discovery-and-use-case-scoping`](applied-ai-architect/03-discovery-and-use-case-scoping/README.md) | Discovery, use-case scoping, value case (CCAR-P D1, D6) | 📝 |
+| 04 | [`04-solution-architecture-patterns`](applied-ai-architect/04-solution-architecture-patterns/README.md) | Solution architecture patterns (CCAR-P D1, D3) | 📝 |
+| 05 | [`05-model-strategy-and-customization`](applied-ai-architect/05-model-strategy-and-customization/README.md) | Model strategy and customization (CCAR-P) | 📝 |
+| 06 | [`06-rag-pipelines`](applied-ai-architect/06-rag-pipelines/README.md) | RAG pipelines (CCAR-P D3) | 📝 |
+| 07–09 | `07-retrieval-strategy-and-knowledge-operations`, `08-evaluation-design`, `09-experimentation-and-release-gates` | Retrieval quality, evals, release gates (CCAR-P D3, D4) | ⏳ |
 | 10–13 | `10-llm-application-security`, `11-responsible-ai-and-safety-controls`, `12-compliance-and-ai-governance`, `13-enterprise-integration-and-identity` | Security, safety, governance, identity (CCAR-P D5, CCDV-F D7) | ⏳ |
 | 14–16 | `14-cloud-deployment-and-platform-choice`, `15-cost-latency-and-scaling`, `16-observability-and-operations` | Deployment, cost and latency, operations (CCAR-P D3, D4) | ⏳ |
 | 17–19 | `17-enterprise-rollout-and-adoption`, `18-stakeholder-communication-and-presales`, `19-poc-to-production-delivery-and-handoff` | Rollout, stakeholders, delivery and handoff (CCAR-P D6) | ⏳ |

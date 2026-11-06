@@ -302,6 +302,65 @@ The folders below are planned and are listed without links until they exist. Cha
 | `21-managed-agents-memory-and-frameworks` | Your own loop vs the Agent SDK vs Claude Managed Agents, agent memory, HITL checkpoints, agent frameworks (Strands, LangGraph, PydanticAI) | CCDV-F D1 | ⏳ |
 | `22-claude-apps-projects-and-cowork` | Claude apps for knowledge work: Projects, artifacts, research, connectors, skills and plugins in the apps, Claude Cowork | CCAO-F D2, D3, D5 | ⏳ |
 
+#### Will cover: topics recorded for the planned chapters
+
+A gap review in November 2026 found the topics below thin or missing in chapters 01–13. CCAR-F needs none of them beyond what 01–13 already teach. They are recorded here so they land in the right chapter. "Feeds" lists the Academy or Partner Academy courses whose outlines each chapter follows ("Claude Code badge" is the Claude Partner Badge: Claude Code path). Deployment, identity and delivery topics go to the [applied-ai-architect chapter plan](../applied-ai-architect/README.md#chapter-plan).
+
+- **14 · Streaming, thinking and resilient clients**
+  - Stream event order; collecting partial tool input
+  - Reconnect and retry for long streams
+  - Adaptive thinking vs effort; interleaved thinking between tool calls
+  - Returning thinking blocks unchanged (first noted in [chapter 02](02-tool-use/README.md))
+  - Feeds: Building with the Claude API; Claude Platform 101 ("What is thinking?")
+- **15 · Vision, PDFs, files and citations**
+  - Image blocks and their limits; PDF input
+  - Files API: upload once, reference by ID
+  - Code execution on an uploaded file, then download the output
+  - Citations, building on [chapter 12](12-provenance/README.md)
+  - Feeds: Building with the Claude API; Claude Platform 101 (built-in tools)
+- **16 · Models, prompt caching and cost**
+  - Migration checklist: find every caller of a retiring model
+  - Fix settings a new model rejects (prefill, forced `tool_choice`, sampling); catch replies that change without an error
+  - Platform spend control: workspaces, spend and rate limits, Console Workbench
+  - Feeds: Claude Platform & Model Foundations; Product Foundations; Working with Claude Fable 5.1; Upgrade a client's build to the Claude 5.5 models
+- **17 · Agent Skills and customization choices**
+  - Skills through the API: upload, attach via the container, pin a version
+  - API Skills vs Claude Code skills
+  - Troubleshooting: not triggering, name and precedence conflicts, runtime errors
+  - Feeds: Introduction to Agent Skills; Claude Platform 101 (Skills); Claude Code badge: Extensibility
+- **18 · MCP in production**
+  - Sampling: server-initiated model calls through the client
+  - Progress and logging notifications for long tools
+  - Roots: scoping a server's file access
+  - Feeds: Model Context Protocol: Advanced Topics
+- **19 · Claude Code for teams**
+  - Install surfaces (CLI, IDEs, dev containers, headless CI); pre-install IT checklist
+  - Corporate proxy and custom CA certificates
+  - Settings precedence table; `managed-settings.json` (forced login, MCP allow/deny, hook limits) and its delivery mechanisms
+  - Short, policy-only org CLAUDE.md
+  - Bash sandbox and filesystem scoping: an honest "is it sandboxed?"
+  - Custom subagents in `.claude/agents/`; when not to fan out
+  - Plugins and marketplaces, with versioning
+  - Feeds: Claude Code badge: Installation and Environments, Configuration and Customization, Extensibility, Security and Governance; Introduction to Subagents; Deployment Architecture (proxy)
+- **20 · Claude Code automation at scale**
+  - Unattended goal/loop runs; parallel sessions in git worktrees
+  - Verify skills and Stop hooks gated on real tests; more evidence for less-watched runs
+  - Routines vs `claude -p` in your own CI
+  - Telemetry: OpenTelemetry export, Analytics and Compliance APIs, audit logs, per-team cost
+  - Claude Security: reasoning-based review next to SAST, triaging findings, fix-and-PR with a human gate
+  - Feeds: Claude Code in Action; Claude on Google Cloud (Claude Code modules); Claude Code badge: Administration and Measurement, capstone; Claude Security
+- **21 · Managed agents, memory and frameworks**
+  - Decision table: own loop vs Agent SDK vs Managed Agents
+  - A minimal managed-agent run that reads the event stream
+  - Feeds: Claude Platform 101 (Managed Agents)
+- **22 · Claude apps, Projects and Cowork**
+  - Entry-point decision table: app, Projects, Cowork, Claude Code, API, cloud
+  - App memory and Projects knowledge; when to start a fresh chat
+  - Standing context: global instructions, projects, skills, plugins
+  - The Cowork loop, scheduled and cloud-run tasks, safety habits
+  - Artifacts, connectors, enterprise search, research; Claude in Chrome and Microsoft 365
+  - Feeds: Claude 101; Introduction to Claude Cowork; Claude Platform & Model Foundations
+
 ### Exam prep: one folder per certification
 
 The chapters are written against the CCAR-F blueprint, and each chapter's **Certification coverage** section also maps the matching requirements of the other three exams. [`exam-prep/`](exam-prep/README.md) turns those mappings into a study path per exam. Every certification folder has a README (blueprint, domain → chapter map, study plan, traps), `01_practice.ipynb` (scenario drills) and `02_homework.ipynb` (a full-length original mock in the exam's format and weights).
